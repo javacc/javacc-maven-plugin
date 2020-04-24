@@ -144,6 +144,11 @@ class JJTree
     private String codeGenerator;
 
     /**
+     * The option OUTPUT_LANGUAGE.
+     */
+    private String ouputLanguage;
+
+    /**
      * Sets the absolute path to the grammar file to pass into JJTree for preprocessing.
      * 
      * @param value The absolute path to the grammar file to pass into JJTree for preprocessing.
@@ -381,6 +386,16 @@ class JJTree
     }
 
     /**
+     * Sets the option OUTPUT_LANGUAGE.
+     * 
+     * @param value The option value, may be <code>null</code> to use the value provided in the grammar or the default.
+     */
+    public void setOutputLanguage( String value )
+    {
+        this.ouputLanguage = value;
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected int execute()
@@ -501,6 +516,11 @@ class JJTree
         if ( StringUtils.isNotEmpty( this.codeGenerator ) )
         {
             argsList.add( "-CODE_GENERATOR=" + this.codeGenerator );
+        }
+
+        if ( StringUtils.isNotEmpty( this.ouputLanguage ) )
+        {
+            argsList.add( "-OUTPUT_LANGUAGE=" + this.ouputLanguage );
         }
 
         if ( this.outputDirectory != null )

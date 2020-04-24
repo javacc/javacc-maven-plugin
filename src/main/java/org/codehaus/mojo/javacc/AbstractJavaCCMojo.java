@@ -282,26 +282,6 @@ public abstract class AbstractJavaCCMojo
     private String grammarEncoding;
 
     /**
-     * The target code generator for compiling this grammar.
-     * 
-     * @parameter property="codeGenerator"
-     * @since 2.7
-     */
-
-    private String codeGenerator;
-
-    /**
-     * Gets the backend code generator.
-     * 
-     * @return The name of the code generator (Java, C++, C#) 
-     * @since 2.7
-     */
-    protected String getCodeGenerator()
-    {
-        return this.codeGenerator;
-    }
-
-    /**
      * Gets the file encoding of the grammar files.
      * 
      * @return The file encoding of the grammar files or <code>null</code> if the user did not specify this mojo
@@ -310,6 +290,46 @@ public abstract class AbstractJavaCCMojo
     protected String getGrammarEncoding()
     {
         return this.grammarEncoding;
+    }
+
+    /**
+     * The target code generator for compiling this grammar.
+     * 
+     * @parameter property="codeGenerator"
+     * @since 3.0
+     */
+
+    private String codeGenerator;
+
+    /**
+     * Gets the backend code generator.
+     * 
+     * @return The name of the code generator (Java, C++, C#) 
+     * @since 3.0
+     */
+    protected String getCodeGenerator()
+    {
+        return this.codeGenerator;
+    }
+
+    /**
+     * The target code generator for compiling this grammar.
+     * 
+     * @parameter property="outputLanguage"
+     * @since 3.0
+     */
+
+    private String outputLanguage;
+
+    /**
+     * Gets the backend code generator.
+     * 
+     * @return The name of the code generator (Java, C++, C#) 
+     * @since 3.0
+     */
+    protected String getOutputLanguage()
+    {
+        return this.outputLanguage;
     }
 
     /**
@@ -536,16 +556,18 @@ public abstract class AbstractJavaCCMojo
         try
         {
             Collection tempFiles = null;
-            if (StringUtils.isBlank(codeGenerator) || codeGenerator.equalsIgnoreCase("Java"))
+            if ((StringUtils.isBlank(codeGenerator) && StringUtils.isBlank(outputLanguage)) || 
+            		(codeGenerator != null && codeGenerator.equalsIgnoreCase("Java")) || 
+            		(outputLanguage != null && outputLanguage.equalsIgnoreCase("Java")))
             {
             	tempFiles = FileUtils.getFiles( tempDirectory, "*." + Suffix.Java.string(), null );
             } else
-            if (codeGenerator.equalsIgnoreCase("C++"))
+            if (codeGenerator.equalsIgnoreCase("C++") || outputLanguage.equalsIgnoreCase("C++"))
             {
             	tempFiles = FileUtils.getFiles( tempDirectory, "*." + Suffix.Cpp.string(), null );
             	tempFiles.addAll(FileUtils.getFiles( tempDirectory, "*.h", null ));
             } else
-            if (codeGenerator.equalsIgnoreCase("C#"))
+            if (codeGenerator.equalsIgnoreCase("C#") || outputLanguage.equalsIgnoreCase("C#"))
             {
             	tempFiles = FileUtils.getFiles( tempDirectory, "*." + Suffix.CSharp.string(), null );
             }
@@ -729,6 +751,7 @@ public abstract class AbstractJavaCCMojo
         javacc.setUserTokenManager( this.userTokenManager );
         javacc.setSupportClassVisibilityPublic( this.supportClassVisibilityPublic );
         javacc.setCodeGenerator(this.codeGenerator);
+        javacc.setOutputLanguage(this.outputLanguage);
         return javacc;
     }
 

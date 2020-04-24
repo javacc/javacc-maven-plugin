@@ -371,6 +371,7 @@ public class JJTreeJavaCCMojo
         jjtree.setVisitorReturnType( this.visitorReturnType );
         jjtree.setVisitorException( this.visitorException );
         jjtree.setCodeGenerator(this.getCodeGenerator());
+        jjtree.setOutputLanguage(this.getOutputLanguage());
         jjtree.setNodeDirectory(this.getNodeDirectory());
         return jjtree;
     }
