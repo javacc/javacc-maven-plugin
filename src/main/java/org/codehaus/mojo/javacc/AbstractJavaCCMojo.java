@@ -557,17 +557,16 @@ public abstract class AbstractJavaCCMojo
         {
             Collection tempFiles = null;
             if ((StringUtils.isBlank(codeGenerator) && StringUtils.isBlank(outputLanguage)) || 
-            		(codeGenerator != null && codeGenerator.equalsIgnoreCase("Java")) || 
-            		(outputLanguage != null && outputLanguage.equalsIgnoreCase("Java")))
+            	StringUtils.equalsIgnoreCase(codeGenerator, "Java") || StringUtils.equalsIgnoreCase(outputLanguage, "Java"))
             {
             	tempFiles = FileUtils.getFiles( tempDirectory, "*." + Suffix.Java.string(), null );
             } else
-            if (codeGenerator.equalsIgnoreCase("C++") || outputLanguage.equalsIgnoreCase("C++"))
+            if (StringUtils.equalsIgnoreCase(codeGenerator, "C++") || StringUtils.equalsIgnoreCase(outputLanguage, "C++"))
             {
             	tempFiles = FileUtils.getFiles( tempDirectory, "*." + Suffix.Cpp.string(), null );
             	tempFiles.addAll(FileUtils.getFiles( tempDirectory, "*.h", null ));
             } else
-            if (codeGenerator.equalsIgnoreCase("C#") || outputLanguage.equalsIgnoreCase("C#"))
+            if (StringUtils.equalsIgnoreCase(codeGenerator, "C#") || StringUtils.equalsIgnoreCase(outputLanguage, "C#"))
             {
             	tempFiles = FileUtils.getFiles( tempDirectory, "*." + Suffix.CSharp.string(), null );
             }
