@@ -53,7 +53,7 @@ under the License.
 		<connection>scm:git:https://github.com/javacc/javacc-maven-plugin.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/javacc/javacc-maven-plugin.git</developerConnection>
 		<url>https://github.com/javacc/javacc-maven-plugin</url>
-		<tag>javacc-maven-plugin-3.0.2</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
