@@ -335,8 +335,4 @@ under the License.
 			</plugin>
 		</plugins>
 	</build>
-	<reporting>
-		<plugins>
-		</plugins>
-	</reporting>
 </project>
