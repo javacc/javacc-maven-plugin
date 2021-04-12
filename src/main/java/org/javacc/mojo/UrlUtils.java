@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

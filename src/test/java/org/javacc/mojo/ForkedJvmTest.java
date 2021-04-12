@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,7 +22,7 @@ package org.javacc;
 import java.io.File;
 
 import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
-import org.javacc.ForkedJvm;
+import org.javacc.mojo.ForkedJvm;
 
 import junit.framework.TestCase;
 

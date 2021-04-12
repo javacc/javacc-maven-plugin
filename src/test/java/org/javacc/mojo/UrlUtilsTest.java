@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,7 +22,7 @@ package org.javacc;
 import java.io.File;
 import java.net.URL;
 
-import org.javacc.UrlUtils;
+import org.javacc.mojo.UrlUtils;
 
 import junit.framework.TestCase;
 

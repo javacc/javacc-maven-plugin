@@ -1,6 +1,6 @@
-package org.javacc;
+package org.javacc.mojo;
 
-import org.javacc.JJDoc;
+import org.javacc.mojo.JavaCC;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,19 +24,19 @@ import org.javacc.JJDoc;
 import junit.framework.TestCase;
 
 /**
- * Tests <code>JJDoc</code> facade.
+ * Tests <code>JavaCC</code> facade.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class JJDocTest
+public class JavaCCTest
     extends TestCase
 {
 
     public void testToStringNullSafe()
         throws Exception
     {
-        JJDoc tool = new JJDoc();
+        JavaCC tool = new JavaCC();
         String string = tool.toString();
         assertNotNull( string );
         assertTrue( string.indexOf( "null" ) < 0 );
@@ -45,11 +45,31 @@ public class JJDocTest
     public void testSettersNullSafe()
         throws Exception
     {
-        JJDoc tool = new JJDoc();
+        JavaCC tool = new JavaCC();
         tool.setInputFile( null );
-        tool.setOutputFile( null );
-        tool.setOneTable( null );
-        tool.setText( null );
+        tool.setOutputDirectory( null );
+        tool.setJdkVersion( null );
+        tool.setStatic( null );
+        tool.setBuildParser( null );
+        tool.setBuildTokenManager( null );
+        tool.setCacheTokens( null );
+        tool.setChoiceAmbiguityCheck( null );
+        tool.setCommonTokenAction( null );
+        tool.setDebugLookAhead( null );
+        tool.setDebugParser( null );
+        tool.setDebugTokenManager( null );
+        tool.setErrorReporting( null );
+        tool.setForceLaCheck( null );
+        tool.setIgnoreCase( null );
+        tool.setJavaUnicodeEscape( null );
+        tool.setKeepLineColumn( null );
+        tool.setLookAhead( null );
+        tool.setOtherAmbiguityCheck( null );
+        tool.setSanityCheck( null );
+        tool.setTokenManagerUsesParser( null );
+        tool.setUnicodeInput( null );
+        tool.setUserCharStream( null );
+        tool.setUserTokenManager( null );
         tool.setLog( null );
     }
 

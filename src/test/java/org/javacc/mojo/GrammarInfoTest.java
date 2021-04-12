@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,8 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import org.javacc.GrammarInfo;
-import org.javacc.Suffix;
+import org.javacc.mojo.GrammarInfo;
+import org.javacc.mojo.Suffix;
 
 import junit.framework.TestCase;
 

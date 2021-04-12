@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,28 +19,25 @@ package org.javacc;
  * under the License.
  */
 
-import java.io.File;
-
 /**
- * Scans source directories for JavaCC grammar files. This scanner supports {@link JJTreeMojo} and {@link JTBMojo} which
- * perform timestamp checking against copies of the input grammars rather than against the generated parser files.
- * Hence, the directory configured by {@link #setOutputDirectory(File)} is taken to be the output directory for the
- * timestamp files.
+ * Supports {@link ForkedJvmTest}.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-class LegacyGrammarDirectoryScanner
-    extends GrammarDirectoryScanner
+public class MainStub
 {
 
-    /**
-     * {@inheritDoc}
-     */
-    protected File[] getTargetFiles( File targetDirectory, String grammarFile, GrammarInfo grammarInfo )
+    public static void main( String[] args )
     {
-        File timestampFile = new File( targetDirectory, grammarFile );
-        return new File[] { timestampFile };
+        for ( int i = 0; i < args.length; i++ )
+        {
+            System.out.println( args[i] );
+        }
+
+        System.err.println( System.getProperty( "user.dir" ) );
+
+        System.exit( 27 );
     }
 
 }

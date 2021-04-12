@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 public enum Suffix {
 	Java("java"),

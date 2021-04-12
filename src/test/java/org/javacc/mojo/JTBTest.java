@@ -1,4 +1,4 @@
-package org.javacc;
+package org.javacc.mojo;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,7 +21,7 @@ package org.javacc;
 
 import java.io.File;
 
-import org.javacc.JTB;
+import org.javacc.mojo.JTB;
 
 import junit.framework.TestCase;
 
