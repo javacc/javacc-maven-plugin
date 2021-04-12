@@ -1,4 +1,6 @@
-package org.codehaus.mojo.javacc;
+package org.javacc;
+
+import org.javacc.JavaCC;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +21,22 @@ package org.codehaus.mojo.javacc;
  * under the License.
  */
 
-import java.io.File;
-
-import org.javacc.JTB;
-
 import junit.framework.TestCase;
 
 /**
- * Tests <code>JTB</code> facade.
+ * Tests <code>JavaCC</code> facade.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class JTBTest
+public class JavaCCTest
     extends TestCase
 {
 
     public void testToStringNullSafe()
         throws Exception
     {
-        JTB tool = new JTB();
+        JavaCC tool = new JavaCC();
         String string = tool.toString();
         assertNotNull( string );
         assertTrue( string.indexOf( "null" ) < 0 );
@@ -47,37 +45,32 @@ public class JTBTest
     public void testSettersNullSafe()
         throws Exception
     {
-        JTB tool = new JTB();
+        JavaCC tool = new JavaCC();
         tool.setInputFile( null );
         tool.setOutputDirectory( null );
-        tool.setNodeDirectory( null );
-        tool.setVisitorDirectory( null );
-        tool.setDescriptiveFieldNames( null );
-        tool.setJavadocFriendlyComments( null );
-        tool.setNodePackageName( null );
-        tool.setNodeParentClass( null );
-        tool.setPackageName( null );
-        tool.setParentPointers( null );
-        tool.setPrinter( null );
-        tool.setScheme( null );
-        tool.setSpecialTokens( null );
-        tool.setSupressErrorChecking( null );
-        tool.setVisitorPackageName( null );
+        tool.setJdkVersion( null );
+        tool.setStatic( null );
+        tool.setBuildParser( null );
+        tool.setBuildTokenManager( null );
+        tool.setCacheTokens( null );
+        tool.setChoiceAmbiguityCheck( null );
+        tool.setCommonTokenAction( null );
+        tool.setDebugLookAhead( null );
+        tool.setDebugParser( null );
+        tool.setDebugTokenManager( null );
+        tool.setErrorReporting( null );
+        tool.setForceLaCheck( null );
+        tool.setIgnoreCase( null );
+        tool.setJavaUnicodeEscape( null );
+        tool.setKeepLineColumn( null );
+        tool.setLookAhead( null );
+        tool.setOtherAmbiguityCheck( null );
+        tool.setSanityCheck( null );
+        tool.setTokenManagerUsesParser( null );
+        tool.setUnicodeInput( null );
+        tool.setUserCharStream( null );
+        tool.setUserTokenManager( null );
         tool.setLog( null );
-    }
-
-    public void testGetOutputFile()
-        throws Exception
-    {
-        File input = new File( "Test.jtb" ).getAbsoluteFile();
-        File outdir = new File( "dir" ).getAbsoluteFile();
-
-        JTB tool = new JTB();
-        tool.setInputFile( input );
-        tool.setOutputDirectory( outdir );
-        File output = tool.getOutputFile();
-
-        assertEquals( new File( outdir, "Test.jj" ), output );
     }
 
 }

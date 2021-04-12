@@ -293,12 +293,25 @@ public abstract class AbstractJavaCCMojo
     }
 
     /**
+     * Skip processing.
+     * 
+     * @parameter property="skip"  default-value="false"
+     * @since 3.0
+     */
+
+    private boolean skip;
+
+    private boolean getSkip() {
+    	return skip;
+    }
+
+   /**
      * The target code generator for compiling this grammar.
      * 
      * @parameter property="codeGenerator"
      * @since 3.0
      */
-
+    
     private String codeGenerator;
 
     /**
@@ -422,6 +435,9 @@ public abstract class AbstractJavaCCMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+    	if (skip)
+    		return;
+    	
         GrammarInfo[] grammarInfos = scanForGrammars();
 
         if ( grammarInfos == null )

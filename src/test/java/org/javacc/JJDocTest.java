@@ -1,4 +1,6 @@
-package org.codehaus.mojo.javacc;
+package org.javacc;
+
+import org.javacc.JJDoc;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +21,22 @@ package org.codehaus.mojo.javacc;
  * under the License.
  */
 
-import java.io.File;
-
-import org.javacc.JJTree;
-
 import junit.framework.TestCase;
 
 /**
- * Tests <code>JJTree</code> facade.
+ * Tests <code>JJDoc</code> facade.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class JJTreeTest
+public class JJDocTest
     extends TestCase
 {
 
     public void testToStringNullSafe()
         throws Exception
     {
-        JJTree tool = new JJTree();
+        JJDoc tool = new JJDoc();
         String string = tool.toString();
         assertNotNull( string );
         assertTrue( string.indexOf( "null" ) < 0 );
@@ -47,36 +45,12 @@ public class JJTreeTest
     public void testSettersNullSafe()
         throws Exception
     {
-        JJTree tool = new JJTree();
+        JJDoc tool = new JJDoc();
         tool.setInputFile( null );
-        tool.setOutputDirectory( null );
-        tool.setJdkVersion( null );
-        tool.setStatic( null );
-        tool.setBuildNodeFiles( null );
-        tool.setMulti( null );
-        tool.setNodeDefaultVoid( null );
-        tool.setNodeFactory( null );
-        tool.setNodePackage( null );
-        tool.setNodePrefix( null );
-        tool.setNodeScopeHook( null );
-        tool.setNodeUsesParser( null );
-        tool.setVisitor( null );
-        tool.setVisitorException( null );
+        tool.setOutputFile( null );
+        tool.setOneTable( null );
+        tool.setText( null );
         tool.setLog( null );
-    }
-
-    public void testGetOutputFile()
-        throws Exception
-    {
-        File input = new File( "Test.jjt" ).getAbsoluteFile();
-        File outdir = new File( "dir" ).getAbsoluteFile();
-
-        JJTree tool = new JJTree();
-        tool.setInputFile( input );
-        tool.setOutputDirectory( outdir );
-        File output = tool.getOutputFile();
-
-        assertEquals( new File( outdir, "Test.jj" ), output );
     }
 
 }

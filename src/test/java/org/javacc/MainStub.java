@@ -1,6 +1,4 @@
-package org.codehaus.mojo.javacc;
-
-import org.javacc.JJDoc;
+package org.javacc;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,36 +19,25 @@ import org.javacc.JJDoc;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 /**
- * Tests <code>JJDoc</code> facade.
+ * Supports {@link ForkedJvmTest}.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class JJDocTest
-    extends TestCase
+public class MainStub
 {
 
-    public void testToStringNullSafe()
-        throws Exception
+    public static void main( String[] args )
     {
-        JJDoc tool = new JJDoc();
-        String string = tool.toString();
-        assertNotNull( string );
-        assertTrue( string.indexOf( "null" ) < 0 );
-    }
+        for ( int i = 0; i < args.length; i++ )
+        {
+            System.out.println( args[i] );
+        }
 
-    public void testSettersNullSafe()
-        throws Exception
-    {
-        JJDoc tool = new JJDoc();
-        tool.setInputFile( null );
-        tool.setOutputFile( null );
-        tool.setOneTable( null );
-        tool.setText( null );
-        tool.setLog( null );
+        System.err.println( System.getProperty( "user.dir" ) );
+
+        System.exit( 27 );
     }
 
 }

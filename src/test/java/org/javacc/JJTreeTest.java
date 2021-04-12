@@ -1,6 +1,4 @@
-package org.codehaus.mojo.javacc;
-
-import org.javacc.JavaCC;
+package org.javacc;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,22 +19,26 @@ import org.javacc.JavaCC;
  * under the License.
  */
 
+import java.io.File;
+
+import org.javacc.JJTree;
+
 import junit.framework.TestCase;
 
 /**
- * Tests <code>JavaCC</code> facade.
+ * Tests <code>JJTree</code> facade.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class JavaCCTest
+public class JJTreeTest
     extends TestCase
 {
 
     public void testToStringNullSafe()
         throws Exception
     {
-        JavaCC tool = new JavaCC();
+        JJTree tool = new JJTree();
         String string = tool.toString();
         assertNotNull( string );
         assertTrue( string.indexOf( "null" ) < 0 );
@@ -45,32 +47,36 @@ public class JavaCCTest
     public void testSettersNullSafe()
         throws Exception
     {
-        JavaCC tool = new JavaCC();
+        JJTree tool = new JJTree();
         tool.setInputFile( null );
         tool.setOutputDirectory( null );
         tool.setJdkVersion( null );
         tool.setStatic( null );
-        tool.setBuildParser( null );
-        tool.setBuildTokenManager( null );
-        tool.setCacheTokens( null );
-        tool.setChoiceAmbiguityCheck( null );
-        tool.setCommonTokenAction( null );
-        tool.setDebugLookAhead( null );
-        tool.setDebugParser( null );
-        tool.setDebugTokenManager( null );
-        tool.setErrorReporting( null );
-        tool.setForceLaCheck( null );
-        tool.setIgnoreCase( null );
-        tool.setJavaUnicodeEscape( null );
-        tool.setKeepLineColumn( null );
-        tool.setLookAhead( null );
-        tool.setOtherAmbiguityCheck( null );
-        tool.setSanityCheck( null );
-        tool.setTokenManagerUsesParser( null );
-        tool.setUnicodeInput( null );
-        tool.setUserCharStream( null );
-        tool.setUserTokenManager( null );
+        tool.setBuildNodeFiles( null );
+        tool.setMulti( null );
+        tool.setNodeDefaultVoid( null );
+        tool.setNodeFactory( null );
+        tool.setNodePackage( null );
+        tool.setNodePrefix( null );
+        tool.setNodeScopeHook( null );
+        tool.setNodeUsesParser( null );
+        tool.setVisitor( null );
+        tool.setVisitorException( null );
         tool.setLog( null );
+    }
+
+    public void testGetOutputFile()
+        throws Exception
+    {
+        File input = new File( "Test.jjt" ).getAbsoluteFile();
+        File outdir = new File( "dir" ).getAbsoluteFile();
+
+        JJTree tool = new JJTree();
+        tool.setInputFile( input );
+        tool.setOutputDirectory( outdir );
+        File output = tool.getOutputFile();
+
+        assertEquals( new File( outdir, "Test.jj" ), output );
     }
 
 }
