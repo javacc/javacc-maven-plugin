@@ -1,5 +1,7 @@
 package org.codehaus.mojo.javacc;
 
+import org.javacc.JavaCC;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file 

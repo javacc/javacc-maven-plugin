@@ -22,6 +22,8 @@ package org.codehaus.mojo.javacc;
 import java.io.File;
 import java.net.URL;
 
+import org.javacc.UrlUtils;
+
 import junit.framework.TestCase;
 
 /**

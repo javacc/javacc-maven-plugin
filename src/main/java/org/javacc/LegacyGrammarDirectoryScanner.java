@@ -1,4 +1,4 @@
-package org.codehaus.mojo.javacc;
+package org.javacc;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

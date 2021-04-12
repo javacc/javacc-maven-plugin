@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
+import org.javacc.GrammarInfo;
+import org.javacc.Suffix;
+
 import junit.framework.TestCase;
 
 /**

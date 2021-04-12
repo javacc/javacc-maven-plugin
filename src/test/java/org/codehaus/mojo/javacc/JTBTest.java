@@ -21,6 +21,8 @@ package org.codehaus.mojo.javacc;
 
 import java.io.File;
 
+import org.javacc.JTB;
+
 import junit.framework.TestCase;
 
 /**

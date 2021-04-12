@@ -22,6 +22,7 @@ package org.codehaus.mojo.javacc;
 import java.io.File;
 
 import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
+import org.javacc.ForkedJvm;
 
 import junit.framework.TestCase;
 
