@@ -9,7 +9,13 @@ This differs from the  [codehaus javacc-maven-plugin](http://www.mojohaus.org/ja
 
 ## Quickstart
 
-```
+```xml
+
+<properties>
+   <javacc.version>8.0.1</javacc.version>
+</properties>
+...
+
 <build>
   <plugins>
     <plugin> 
