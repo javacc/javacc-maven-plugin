@@ -482,42 +482,45 @@ public abstract class AbstractJavaCCMojo extends AbstractMojo {
     if (skip) {
       return;
     }
+    synchronized (AbstractJavaCCMojo.class) {
 
-    final GrammarInfo[] grammarInfos = scanForGrammars();
 
-    if (grammarInfos == null) {
-      getLog().warn("'Source directory' " + getSourceDirectory() + " is not a directory!");
-      return;
-    }
+      final GrammarInfo[] grammarInfos = scanForGrammars();
 
-    if (grammarInfos.length == 0) {
-      getLog().info("Nothing to generate: all parsers are up to date");
-    } else {
-      determineNonGeneratedSourceRoots();
+      if (grammarInfos == null) {
+        getLog().warn("'Source directory' " + getSourceDirectory() + " is not a directory!");
+        return;
+      }
 
-      if (StringUtils.isEmpty(grammarEncoding)) {
+      if (grammarInfos.length == 0) {
+        getLog().info("Nothing to generate: all parsers are up to date");
+      } else {
+        determineNonGeneratedSourceRoots();
+
+        if (StringUtils.isEmpty(grammarEncoding)) {
+          getLog()
+              .warn(
+                  "File encoding for grammars has not been configured"
+                      + ", using platform default encoding, i.e. build is platform dependent!");
+        }
+
+        for (int i = 0; i < grammarInfos.length; i++) {
+          processGrammar(grammarInfos[i]);
+        }
+
         getLog()
-            .warn(
-                "File encoding for grammars has not been configured"
-                    + ", using platform default encoding, i.e. build is platform dependent!");
+            .info(
+                "Processed "
+                    + grammarInfos.length
+                    + " grammar"
+                    + (grammarInfos.length != 1 ? "s" : ""));
       }
 
-      for (int i = 0; i < grammarInfos.length; i++) {
-        processGrammar(grammarInfos[i]);
+      final Collection<File> compileSourceRoots =
+          new LinkedHashSet<File>(Arrays.asList(getCompileSourceRoots()));
+      for (final Iterator<File> it = compileSourceRoots.iterator(); it.hasNext(); ) {
+        addSourceRoot(it.next());
       }
-
-      getLog()
-          .info(
-              "Processed "
-                  + grammarInfos.length
-                  + " grammar"
-                  + (grammarInfos.length != 1 ? "s" : ""));
-    }
-
-    final Collection<File> compileSourceRoots =
-        new LinkedHashSet<File>(Arrays.asList(getCompileSourceRoots()));
-    for (final Iterator<File> it = compileSourceRoots.iterator(); it.hasNext(); ) {
-      addSourceRoot(it.next());
     }
   }
 
