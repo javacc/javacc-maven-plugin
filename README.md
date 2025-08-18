@@ -1,6 +1,6 @@
 # Javacc Maven Plugin
 
-This is the [javacc-maven-plugin](http://www.mojohaus.org/javacc-maven-plugin/).
+This is the [javacc-maven-plugin](https://github.com/javacc/javacc-8#user-content-maven), for javacc 8.x and later
 
  
 [![Maven Central](https://img.shields.io/maven-central/v/org.javacc.plugin/javacc-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/org.javacc.plugin/javacc-maven-plugin)
