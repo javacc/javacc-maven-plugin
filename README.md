@@ -17,35 +17,35 @@ This differs from the  [codehaus javacc-maven-plugin](http://www.mojohaus.org/ja
 ...
 
 <build>
-  <plugins>
+<plugins>
     <plugin> 
-      <groupId>org.javacc.plugin</groupId>
-      <artifactId>javacc-maven-plugin</artifactId>       
-      <!--<version>INSERT LATEST VERSION HERE</version>-->
-      <executions>
-        <execution>
-          <goals>
-            <goal>....</goal>
-          </goals>
-        </execution>
-      </executions>
-      <configuration>
-       
-      </configuration>
-      <dependencies>
-         <dependency>
-           <groupId>org.javacc.generator</groupId>
-           <artifactId>java</artifactId>
-           <version>${javacc.version}</version>
-         </dependency>
-         <dependency>
-           <groupId>org.javacc</groupId>
-           <artifactId>core</artifactId>
-           <version>${javacc.version}</version>
-          </dependency>
-       </dependencies>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>3.0.3</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>....</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            
+        </configuration>
+        <dependencies>
+            <dependency>
+                <groupId>org.javacc.generator</groupId>
+                <artifactId>java</artifactId>
+                <version>${javacc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javacc</groupId>
+                <artifactId>core</artifactId>
+                <version>${javacc.version}</version>
+            </dependency>
+        </dependencies>
     </plugin>
-  </plugins>
+</plugins>
 </build>
 ```
  
