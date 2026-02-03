@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+    <artifactId>it-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin.javacc.it-tests</groupId>
+  <artifactId>errors</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Integration Tests - errors</name>
+  <description>Tests producing errors catched by the plugin with appropriate parameters so no build
+    failure should occur.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <executions>
+
+          <execution>
+            <!-- ignored invalid plugin configuration: non-existing sourceDirectory -->
+            <id>javacc-plugin-config-sourceDirectory-non-existing</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <failOnPluginError>false</failOnPluginError>
+              <!-- non-existing source directory: detected -->
+              <sourceDirectory>${basedir}/src/main/non-existing-dir</sourceDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- ignored invalid plugin configuration: not directory sourceDirectory -->
+            <id>javacc-plugin-config-sourceDirectory-not-directory</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <failOnPluginError>false</failOnPluginError>
+              <!-- not directory source directory: detected -->
+              <sourceDirectory>${basedir}/src/main/file-not-dir</sourceDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- ignored invalid plugin configuration: invalid parameter -->
+            <id>javacc-plugin-config-option-invalid</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <failOnPluginError>false</failOnPluginError>
+              <!-- unknown parameter: detected by maven, but gives just a warning at the beginning  -->
+              <jjCmdLineArgs>
+                <gen>-CODE_GENERATOR="WrongCG"</gen>
+              </jjCmdLineArgs>
+              <!-- invalid option: detected -->
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="WrongCG"</gen>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- ignored invalid plugin configuration: invalid outputDirectory path + wrong encoding -->
+            <id>javacc-plugin-config-outputDirectory-wrong-path</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <failOnPluginError>false</failOnPluginError>
+              <!-- non-canonical path -->
+              <sourceDirectory>${basedir}/src/../src/main/csharp</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <jjod>-OUTPUT_DIRECTORY="C:\WrongPath:"</jjod>
+                <enc>-GRAMMAR_ENCODING="WrongEncoding"</enc>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- ignored invalid plugin configuration: not absolute outputDirectory path -->
+            <id>javacc-plugin-config-outputDirectory-not-absolute</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <failOnPluginError>false</failOnPluginError>
+              <failOnProcessorError>ignore</failOnProcessorError>
+              <sourceDirectory>${basedir}/src/main/csharp</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <jjod>-OUTPUT_DIRECTORY="target/"</jjod>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- ignored invalid plugin configuration: 2 inconsistent options -->
+            <id>javacc-plugin-config-inconsistent-options</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjtree-javacc</goal>
+            </goals>
+            <configuration>
+              <failOnPluginError>false</failOnPluginError>
+              <sourceDirectory>${basedir}/src/../src/main/csharp</sourceDirectory>
+              <jjtreeCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <enc>-GRAMMAR_ENCODING="UTF-8"</enc>
+                <jjtod>-JJTREE_OUTPUT_DIRECTORY="${project.build.directory}/gen-src/mytree-c#"</jjtod>
+              </jjtreeCmdLineArgs>
+              <javaccCmdLineArgs>
+                <!-- inconsistent with jjtree's ones, which should be taken -->
+                <gen>-CODE_GENERATOR="C++"</gen>
+                <enc>-GRAMMAR_ENCODING="UTF-16"</enc>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/mycc-c#"</jjod>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- ignored processor error:
+                 1 processor successful (BasîcPãrser8.jj) and
+                 1 processor error (missing production in BasicParser7.jj) -->
+            <id>javacc-processors</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <failOnProcessorError>ignore</failOnProcessorError>
+              <sourceDirectory>${basedir}/src/main/csharp</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <!--  duplicate option will give a warning by the processor -->
+                <arg>-static=false</arg>
+                <arg>-STATIC=true</arg>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- many errors but execution skipped -->
+            <id>errors-but-skip</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+              <sourceDirectory>src/main/non-existing</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="WrongCG"</gen>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-csharp</artifactId>
+            <version>${plexus-compiler-csharp.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>csharp-compile</id>
+            <goals>
+              <!-- need to override parent definition to not compile BasicParser7 -->
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/c#</outputDirectory>
+              <!--  debug default value is true! -->
+              <debug>false</debug>
+              <compilerId>csharp</compilerId>
+              <fork>true</fork>
+              <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+              <compilerArgs>
+                <arg>-nologo:true</arg>
+                <arg>-nowarn:0414</arg>
+                <arg>-utf8output:true</arg>
+                <arg>-target:exe</arg>
+                <arg>-out:${project.artifactId}-7.exe</arg>
+              </compilerArgs>
+              <excludes>
+                <exclude>**</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- compile BasîcPãrser8.jj -->
+            <id>csharp-compile-8</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/c#</outputDirectory>
+              <!--  debug default value is true! -->
+              <debug>false</debug>
+              <compilerId>csharp</compilerId>
+              <fork>true</fork>
+              <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+              <compilerArgs>
+                <arg>-nologo:true</arg>
+                <arg>-nowarn:0414</arg>
+                <arg>-utf8output:true</arg>
+                <arg>-target:exe</arg>
+                <arg>-out:${project.artifactId}-8.exe</arg>
+              </compilerArgs>
+              <includes>
+                <include>ΒΠ8/*.cs</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

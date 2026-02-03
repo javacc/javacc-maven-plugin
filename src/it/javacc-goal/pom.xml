@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+    <artifactId>it-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin.javacc.it-tests</groupId>
+  <artifactId>javacc-goal</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Integration Tests - javacc-goal</name>
+  <description>Tests checking JavaCC default execution on parsers without errors or failures.</description>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <executions>
+
+          <execution>
+            <!-- java + default source and output directories;
+                 parameter invalid value changed to default -->
+            <id>javacc-java</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <!-- wrong values will be changed to 'first' -->
+              <failOnGrammarError>wrong-value</failOnGrammarError>
+              <failOnProcessorError>wrong-value</failOnProcessorError>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="Java"</gen>
+              </javaccCmdLineArgs>
+              <!-- always regenerate -->
+              <timestampDeltaMs>-1</timestampDeltaMs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom (empty & relative & not canonical) source and
+                  output directories -->
+            <id>javacc-java-empty</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <!-- a sourceDirectory relative to ${basedir} and not canonical -->
+              <sourceDirectory>../javacc-goal/src/main/javacc-empty</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="Java"</gen>
+                <jjod> -OUTPUT_DIRECTORY="../javacc-goal/target/gen-src/javacc-empty"</jjod>
+              </javaccCmdLineArgs>
+              <!-- default -->
+              <timestampDeltaMs>0</timestampDeltaMs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom valid source and output directories (with space in them) -->
+            <id>javacc-mycc-1</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <!-- just to add test cases -->
+              <includes>
+                <include>**/*.jj</include>
+              </includes>
+              <excludes>
+                <exclude>**/*5.jj</exclude>
+              </excludes>
+              <sourceDirectory>${basedir}/src/main/my cc</sourceDirectory>
+              <javaccCmdLineArgs>
+                <!-- outputDirectory relative to ${basedir} -->
+                <!--
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/mycc"</jjod>-->
+                <jjod>-OUTPUT_DIRECTORY="target/gen-src/my cc"</jjod>
+              </javaccCmdLineArgs>
+              <!-- huge number ~33 years -->
+              <timestampDeltaMs>1000000000000</timestampDeltaMs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom valid source and output directories (with space in them),
+                  duplication of previous execution to test uptodate case -->
+            <id>javacc-mycc-2</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <!-- just to add test cases -->
+              <!--              <includes>-->
+              <!--                <include>**/*.jj</include>-->
+              <!--              </includes>-->
+              <!--              <excludes>-->
+              <!--                <exclude>**/*5.jj</exclude>-->
+              <!--              </excludes>-->
+              <sourceDirectory>${basedir}/src/main/my cc</sourceDirectory>
+              <javaccCmdLineArgs>
+                <!-- a  outputDirectory relative to ${basedir} -->
+                <!--
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/mycc"</jjod>-->
+                <jjod>-OUTPUT_DIRECTORY="target/gen-src/my cc"</jjod>
+              </javaccCmdLineArgs>
+              <!-- huge number ~33 years -->
+              <timestampDeltaMs>1000000000000</timestampDeltaMs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- C# + custom source directory and default output directory
+                  and keepIntermediateDirectory parameter -->
+            <id>javacc-csharp</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <!-- non-canonical path -->
+              <sourceDirectory>${basedir}/src/../src/main/csharp</sourceDirectory>
+              <keepIntermediateDirectory>true</keepIntermediateDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+              </javaccCmdLineArgs>
+              <!-- default timestampDeltaMs -->
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- for Java & C# compilation -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-csharp</artifactId>
+            <version>${plexus-compiler-csharp.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <!-- for javac, overriding parent execution (with global toolchain setting) -->
+            <id>default-compile</id>
+            <configuration>
+              <excludes>
+                <exclude>**/ßπ6/*.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- for javac (with specific toolchain setting)
+                  (javac 8 does not manage well imported types with non ASCII characters) -->
+            <id>javac-not-8-compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/ßπ6/*.java</include>
+              </includes>
+              <jdkToolchain>
+                <version>[11,)</version>
+              </jdkToolchain>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- for C#; we are producing 2 exe, each one with a main, so we must set 2 executions,
+                the first one overrides the parent one -->
+            <id>csharp-compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/c#</outputDirectory>
+              <!--  debug default value is true! -->
+              <debug>false</debug>
+              <compilerId>csharp</compilerId>
+              <fork>true</fork>
+              <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+              <compilerArgs>
+                <arg>-nologo:true</arg>
+                <arg>-nowarn:0414</arg>
+                <arg>-utf8output:true</arg>
+                <arg>-target:exe</arg>
+                <arg>-out:${project.artifactId}-7.exe</arg>
+              </compilerArgs>
+              <includes>
+                <include>bp5/*.cs</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- for C#; this second execution with another id -->
+            <id>csharp-compile-2</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/c#</outputDirectory>
+              <!--  debug default value is true! -->
+              <debug>false</debug>
+              <compilerId>csharp</compilerId>
+              <fork>true</fork>
+              <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+              <compilerArgs>
+                <arg>-nologo:true</arg>
+                <arg>-nowarn:0414</arg>
+                <arg>-utf8output:true</arg>
+                <arg>-target:exe</arg>
+                <arg>-out:${project.artifactId}-8.exe</arg>
+              </compilerArgs>
+              <includes>
+                <include>ΒΠ8/*.cs</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- No C++ compilation (not really needed) (can be seen in java-8-cpp) -->
+
+    </plugins>
+  </build>
+
+
+</project>

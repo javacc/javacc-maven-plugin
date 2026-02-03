@@ -1,0 +1,133 @@
+import java.io.*;
+import java.util.*;
+
+// just checks for presence / absence of generated / copied files;
+// relies on subsequent successful compilations to ensure most things are OK
+
+int nbErr = 0;
+try {
+    File file;
+    
+    //             <id>jjtree</id>
+    file = new File( basedir, "target/generated-sources/jjtree/Simple1Tree.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>jjtree</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/jjtree/org/jjt_th_jcc/s2/Simple2Tree.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>jjtree</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/jjtree/Simple3Tree.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>jjtree</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/jjtree/org/jjt_th_jcc/s4/Simple4Tree.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>jjtree</id>" );
+        nbErr++;
+    }
+    
+    //             <id>javacc</id>
+    file = new File( basedir, "target/generated-sources/javacc/Simple1.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jjt_th_jcc/s2/Simple2.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jjt_th_jcc/s2/Token.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/Simple3.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jjt_th_jcc/s4/Simple4.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jjt_th_jcc/s4/Token.java" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc</id>" );
+        nbErr++;
+    }
+    
+    //            <id>jjtree-mytree</id>
+    file = new File( basedir, "target/gen-src/my tree/org/jjt_th_jcc/s5/Simple5Tree.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>jjtree-mytree</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/my tree/org/jjt_th_jcc/σ6/Sïmplë6Tree.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>jjtree-mytree</id>" );
+        nbErr++;
+    }
+    
+    //            <id>javacc-mytree</id>
+    file = new File( basedir, "target/gen-src/my cc/org/jjt_th_jcc/s5/Simple5.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mytree</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/my cc/org/jjt_th_jcc/σ6/Sïmplë6.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mytree</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/my cc/org/jjt_th_jcc/σ6/Token.java" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc-mytree</id>" );
+        nbErr++;
+    }
+    
+    //            <id>jjtree-csharp</id>
+    file = new File( basedir, "target/gen-src/mytree-c#/Simple7Tree.cs" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/mytree-c#/Σ8/Sïmplë8Tree.cs" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    
+    //            <id>javacc-csharp</id>
+    file = new File( basedir, "target/gen-src/mycc-c#/Simple7.cs" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/mycc-c#/Token.cs" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/mycc-c#/Σ8/Sïmplë8.cs" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/mycc-c#/Σ8/Token.cs" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    
+} catch( Throwable t ) {
+    t.printStackTrace();
+    return false;
+}
+if (nbErr > 0) return false;
+else return true;

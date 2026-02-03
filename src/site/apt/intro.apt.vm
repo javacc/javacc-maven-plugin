@@ -1,0 +1,93 @@
+ ------
+ Introduction 
+ ------
+  Marc Mazas <mazas.marc at gmail.com>
+ ------
+  January 2026
+ ------
+
+${project.name}
+
+  This is the Maven 3 Plugin from <<javacc.org>> for processing JavaCC/JJTree/JJDoc v8.1+
+   and JTB v1.5+ grammar files.
+
+  The other JavaCC Maven plugins in the wild do not support the full JavaCC <<8>> features
+   (architecture and options).
+
+  Since version 3.8.0+, the plugin is no more compatible (i.e. configuration is different)
+   with its previous versions (3.0.x).
+  
+  Note that one can still use the previous versions with JavaCC 8 if he does not need to pass
+   options not managed by these versions. But users are encouraged to migrate.
+  
+  Note also that one can use the MojoHaus Exec Maven plugin to run JavaCC, JJTree, JJDoc or JTB
+   as standalone executable, within appropriate phases and directories configurations (but those
+   are out of the scope of this documentation).
+
+
+* Features
+
+  Supports the different JavaCC 8 generators, through dependencies declaration.
+
+  Supports javacc, jjtree, jtb & jjdoc simple goals (executing the corresponding processors).
+
+  Supports the combined jjtree-javacc, jtb-javacc goals (chaining execution of the preprocessor
+   and javacc on a grammar file).
+
+  Agnostic of processors options (except of a few ones) (no need to update the plugin when a
+   processor changes its options).
+
+  Supports detection of stale / not stale generated files with respect to the grammar file and
+   the processors artifacts (jars).
+
+  Supports ignoring errors and failing on last error besides usual failing on first error, for
+   plugin configuration, grammar reading and grammar processing errors.
+
+
+* Goals Overview
+  
+  The following goals are meant to participate in the <<<default build>>> lifecycle,
+   phase <<<generate-sources>>>:
+  
+  * <<<{{{./javacc-mojo.html}javacc:javacc}}>>>\
+    Runs JavaCC on (<<<*.jj>>>) grammar files to generate a parser.
+  
+  * <<<{{{./jjtree-javacc-mojo.html}javacc:jjtree-javacc}}>>>\
+    Runs JJTree then JavaCC in a pipeline to process (<<<*.jjt>>>) grammar files to generate a parser.
+  
+  * <<<{{{./jjtree-mojo.html}javacc:jjtree}}>>>\
+    Runs JJTree on (<<<*.jjt>>>) grammar files to generate annotated (<<<*.jj>>>) grammar files.
+  
+  * <<<{{{./jtb-javacc-mojo.html}javacc:jtb-javacc}}>>>\
+    Runs JTB then JavaCC in a pipeline to process (<<<*.jtb>>>) grammar files to generate a parser.
+  
+  * <<<{{{./jtb-mojo.html}javacc:jtb}}>>>\
+    Runs JTB on (<<<*.jtb>>>) grammar files to generate annotated (<<<*.jj>>>) grammar files.
+  
+  * <<<{{{./jjdoc-mojo.html}javacc:jjdoc}}>>>\
+    Generates BNF documentation from the grammar files.
+    
+  []
+  
+  This previous <<<{{{./jjdoc-mojo.html}javacc:jjdoc}}>>> goal is also triggered by the <<<site>>>
+   lifecycle, phase <<<site>>>:
+  
+  * <<<{{{./jjdoc-mojo.html}javacc:jjdoc}}>>>\
+    Generates BNF documentation from the grammar files for usage as site reports.
+
+  []
+  
+  This last goal is for displaying information on the plugin:
+  
+  * <<<{{{./help-mojo.html}javacc:help}}>>>\
+    Displays parameters for all or one goal.
+   
+* {Usage}
+  
+  Detailed instructions on how to use the JavaCC plugin (pom configuration, debug mode) can be
+   found on the {{{./usage.html}usage}} page.
+  
+  In case you still have questions regarding the plugin's usage, or if you feel like the plugin
+   is missing a feature or has a defect, you can fill a feature request or bug report in our
+  {{{https://github.com/javacc/javacc-maven-plugin/issues}issue tracker}}.
+

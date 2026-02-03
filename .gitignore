@@ -1,6 +1,9 @@
 target/
 
-# Eclipse generated files
+# old stuff
+src/old*
+
+# Eclipse files
 bin/
 .settings/
 .classpath

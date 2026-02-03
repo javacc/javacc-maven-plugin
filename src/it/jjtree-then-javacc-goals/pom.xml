@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+    <artifactId>it-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin.javacc.it-tests</groupId>
+  <artifactId>jjtree-then-javacc-goals</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Integration Tests - jjtree-then-javacc-goals</name>
+  <description>Tests checking JJTree then JavaCC default executions on parsers without errors or
+    failures.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <executions>
+
+          <execution>
+            <!-- java + default source and output directories -->
+            <id>jjtree</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjtree</goal>
+            </goals>
+            <configuration>
+              <jjtreeCmdLineArgs>
+                <gen>-CODE_GENERATOR="Java"</gen>
+              </jjtreeCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- javacc after previous jjtree -->
+            <id>javacc</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/generated-sources/jjtree</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="Java"</gen>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom valid source and output directories
+                      + no code generator option -->
+            <id>jjtree-mytree</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjtree</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*.jjt</include>
+              </includes>
+              <excludes>
+                <exclude>**/*1.jjt</exclude>
+              </excludes>
+              <sourceDirectory>${basedir}/src/main/my tree</sourceDirectory>
+              <!-- here we override parent's arguments to get rid of GRAMMAR_ENCODING setting -->
+              <jjtreeCmdLineArgs combine.self="override">
+                <!--                <gen>-CODE_GENERATOR="Java"</gen>-->
+                <jjtod>-JJTREE_OUTPUT_DIRECTORY="${project.build.directory}/gen-src/my tree"</jjtod>
+                <enc>-GRAMMAR_ENCODING="UTF-8"</enc>
+              </jjtreeCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- javacc after previous jjtree -->
+            <id>javacc-mytree</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/gen-src/my tree</sourceDirectory>
+              <!-- here we override parent's arguments to get rid of GRAMMAR_ENCODING setting -->
+              <javaccCmdLineArgs combine.self="override">
+                <!--                <gen>-CODE_GENERATOR="Java"</gen>-->
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/my cc"</jjod>
+                <enc>-GRAMMAR_ENCODING="UTF-8"</enc>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- C# + custom (non-canonical) source and output directories -->
+            <!-- note that the namespace is set inside the 2 grammar files, otherwise we would
+                 need to set 2 different executions with includes / excludes -->
+            <id>jjtree-csharp</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjtree</goal>
+            </goals>
+            <configuration>
+              <!-- non-canonical path -->
+              <sourceDirectory>${basedir}/src/../src/main/csharp</sourceDirectory>
+              <jjtreeCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <jjtod>-JJTREE_OUTPUT_DIRECTORY="${project.build.directory}/gen-src/mytree-c#"</jjtod>
+              </jjtreeCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- javacc after previous jjtree -->
+            <id>javacc-csharp</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/gen-src/mytree-c#</sourceDirectory>
+              <javaccCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/mycc-c#"</jjod>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-csharp</artifactId>
+            <version>${plexus-compiler-csharp.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <!-- for javac, overriding parent execution (with global toolchain setting) -->
+            <id>default-compile</id>
+            <configuration>
+              <excludes>
+                <exclude>**/σ6/*.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- for javac (with specific toolchain setting)
+                  (javac 8 does not manage well imported types with non ASCII characters) -->
+            <id>javac-not-8-compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/σ6/*.java</include>
+              </includes>
+              <jdkToolchain>
+                <version>[11,)</version>
+              </jdkToolchain>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- for C#; we are producing 2 exe, each one with a main, so we must set 2 executions,
+                the first one overrides the parent one -->
+            <id>csharp-compile</id>
+            <goals>
+              <!-- need to override parent definition-->
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/c#</outputDirectory>
+              <!--  debug default value is true! -->
+              <debug>false</debug>
+              <compilerId>csharp</compilerId>
+              <fork>true</fork>
+              <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+              <compilerArgs>
+                <arg>-nologo:true</arg>
+                <arg>-nowarn:0414</arg>
+                <arg>-utf8output:true</arg>
+                <arg>-target:exe</arg>
+                <arg>-out:${project.artifactId}-7.exe</arg>
+              </compilerArgs>
+              <includes>
+                <include>s5/*.cs</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>csharp-compile-2</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/c#</outputDirectory>
+              <!--  debug default value is true! -->
+              <debug>false</debug>
+              <compilerId>csharp</compilerId>
+              <fork>true</fork>
+              <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+              <compilerArgs>
+                <arg>-nologo:true</arg>
+                <arg>-nowarn:0414</arg>
+                <arg>-utf8output:true</arg>
+                <arg>-target:exe</arg>
+                <arg>-out:${project.artifactId}-8.exe</arg>
+              </compilerArgs>
+              <includes>
+                <include>Σ8/*.cs</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- The package-less grammars of this project produce "duplicated (generated) classes""
+            compile conflict errors with the package-less grammars of some other projects
+            when these projects are configured under Eclipse with source folders and auto build and
+            when this build is run as standalone (i.e. not part of the project's build);
+           in order to leave the build without problems markers in Eclipse we add a step to
+            clean the offending generated standard helper files.
+           Note that this does not reduce the tests coverage and validity :-) -->
+      <plugin>
+        <!-- clean some of the generated files after the package phase -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>${maven-clean-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>clean-classes</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}/generated-sources/jjtree</directory>
+                  <includes>
+                    <include>Node.java</include>
+                    <include>Tree.java</include>
+                  </includes>
+                </fileset>
+                <fileset>
+                  <directory>${project.build.directory}/generated-sources/javacc</directory>
+                  <includes>
+                    <include>ParseException.java</include>
+                    <include>SimpleCharStream.java</include>
+                    <include>Token.java</include>
+                    <include>TokenMgrError.java</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

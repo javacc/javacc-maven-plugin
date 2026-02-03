@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+    <artifactId>it-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin.javacc.it-tests</groupId>
+  <artifactId>site-phase</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Integration Tests - site-phase</name>
+  <description>Tests checking JJDoc executions on different grammars, as site phase.</description>
+
+  <reporting>
+    <plugins>
+
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+
+        <!-- here in the reporting section (called by mvn site) the plugin does not have
+              multiple executions, so we cannot define different configurations,
+              so we need to put JJDoc options inside the grammars (CSS, format...)
+              note here we set the OUTPUT_DIRECTORY and jjdocReportsDirectory -->
+
+        <configuration>
+          <sourceDirectories>
+            <sourceDirectory>${basedir}/src/main/javacc</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/empty</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/no-grammar</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/jtb</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/my cc</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/csharp</sourceDirectory>
+          </sourceDirectories>
+          <jjdocReportsPage>jjdoc-site-reports</jjdocReportsPage>
+          <jjdocCmdLineArgs>
+            <jjdod>-OUTPUT_DIRECTORY="${project.build.directory}/site/jjdoc-out"</jjdod>
+          </jjdocCmdLineArgs>
+          <jjdocReportsDirectory>${project.build.directory}/site</jjdocReportsDirectory>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+
+        <!-- as above in the reporting section we could not test in one execution normal cases
+              and error cases, we use a trick (that seems legal) and define a build execution
+              that triggers the jjdoc goal within the site phase -->
+
+        <executions>
+          <execution>
+            <id>error-site</id>
+            <phase>site</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <!-- do not fail the build-->
+              <failOnPluginError>false</failOnPluginError>
+              <sourceDirectories>
+                <sourceDirectory>${basedir}/src/main/unknown-dir</sourceDirectory>
+                <sourceDirectory>${basedir}/src/main/javacc</sourceDirectory>
+              </sourceDirectories>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>

@@ -1,43 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
-  Licensed to the Apache Software Foundation (ASF) under one
-  or more contributor license agreements.  See the NOTICE file
-  distributed with this work for additional information
-  regarding copyright ownership.  The ASF licenses this file
-  to you under the Apache License, Version 2.0 (the
-  "License"); you may not use this file except in compliance
-  with the License.  You may obtain a copy of the License at
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
 
-    http://www.apache.org/licenses/LICENSE-2.0
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-  Unless required by applicable law or agreed to in writing,
-  software distributed under the License is distributed on an
-  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  KIND, either express or implied.  See the License for the
-  specific language governing permissions and limitations
-  under the License.
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
 -->
+<site xmlns="http://maven.apache.org/SITE/2.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
+>
 
-<project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <bannerLeft name="JavaCC Maven plugin" href="https://github.com/javacc/javacc-maven-plugin"></bannerLeft>
+  <bannerRight name="from javacc.org" href="https://github.com/javacc"></bannerRight>
+
   <body>
+    <breadcrumbs>
+      <item name="javacc.org" href="https://github.com/javacc" />
+      <item name="${this.name}" href="${this.url}" />
+    </breadcrumbs>
     <menu name="Overview">
-      <item name="Introduction" href="index.html"/>
-      <item name="Goals" href="plugin-info.html"/>
-      <item name="Usage" href="usage.html"/>
-      <item name="FAQ" href="faq.html"/>
+      <item name="Introduction" href="intro.html" />
+      <item name="Plugin Documentation" href="plugin-info.html" />
+      <item name="Usage" href="usage.html" />
+      <item name="Sonatype Hosting" href="https://central.sonatype.com/artifact/org.javacc.plugin/javacc-maven-plugin" />
+      <item name="License" href="https://www.apache.org/licenses/" />
     </menu>
-    <menu name="Examples">
-      <item name="JavaCC" href="examples/example-javacc.html"/>
-      <item name="JJTree" href="examples/example-jjtree.html"/>
-      <item name="JTB" href="examples/example-jtb.html"/>
-      <item name="JJDoc" href="examples/example-jjdoc.html"/>
+    <menu name="Goals">
+      <item name="javacc" href="javacc-mojo.html" />
+      <item name="jjtree" href="jjtree-mojo.html" />
+      <item name="jjtree-javacc" href="jjtree-javacc-mojo.html" />
+      <item name="jtb" href="jtb-mojo.html" />
+      <item name="jtb-javacc" href="jtb-javacc-mojo.html" />
+      <item name="jjdoc" href="jjdoc-mojo.html" />
+      <item name="help" href="help-mojo.html" />
     </menu>
     <menu name="References">
-      <item name="JavaCC" href="https://javacc.github.io/javacc/"/>
-      <item name="JJTree" href="https://javacc.github.io/javacc/"/>
-      <item name="JTB" href="http://compilers.cs.ucla.edu/jtb/"/>
-      <item name="JJDoc" href="https://javacc.github.io/javacc/doc/JJDoc.html"/>
+      <item name="JavaCC / JJTree / JJDoc web site" href="https://javacc.github.io/javacc/" />
+      <item name="JavaCC / JJTree / JJDoc documentation"
+        href="https://javacc.github.io/javacc/documentation/jjdoc.html" />
+      <item name="JavaCC repositories" href="https://github.com/javacc/" />
+      <item name="JTB repository" href="https://github.com/jtb-javacc/" />
+      <item name="The javacc-maven-plugin README"
+        href="https://github.com/javacc/javacc-maven-plugin/blob/release/README.md" />
     </menu>
+    <menu ref="reports" />
   </body>
-</project>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>${maven-fluido-skin.version}</version>
+  </skin>
+
+</site>

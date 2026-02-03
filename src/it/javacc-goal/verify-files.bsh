@@ -1,0 +1,88 @@
+import java.io.*;
+import java.util.*;
+
+// just checks for presence / absence of generated / copied files;
+// relies on subsequent successful compilations to ensure most things are OK
+
+int nbErr = 0;
+try {
+    File file;
+    
+    //             <id>javacc-java</id>
+    file = new File( basedir, "target/generated-sources/javacc/BasicParser1.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jcc/bp2/BasicParser2.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jcc/bp2/Token.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/BasicParser3.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jcc/bp4/BasicParser4.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/org/jcc/bp4/Token.java" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc-java</id>" );
+        nbErr++;
+    }
+    
+    //            <id>javacc-java-empty</id>
+    // nothing to generate
+    
+    //            <id>javacc-mycc-1</id>
+    file = new File( basedir, "target/gen-src/my cc/org/jcc/bp5/BasicParser5.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mycc-1</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/gen-src/my cc/org/jcc/ßπ6/BasîcPãrser6.java" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mycc-1</id>" );
+        nbErr++;
+    }
+    
+    //            <id>javacc-mycc-2</id>
+    // nothing regenerated, already there
+    
+    //            <id>javacc-csharp</id>
+    file = new File( basedir, "target/generated-sources/javacc/BasicParser7.cs" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/Token.cs" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/ΒΠ8/BasîcPãrser8.cs" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-sources/javacc/ΒΠ8/Token.cs" );
+    if ( file.exists() ) {
+        System.err.println( "Should not have copied custom file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    
+} catch( Throwable t ) {
+    t.printStackTrace();
+    return false;
+}
+if (nbErr > 0) return false;
+else return true;

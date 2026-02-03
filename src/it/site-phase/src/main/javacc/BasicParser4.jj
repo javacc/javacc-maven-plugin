@@ -1,0 +1,39 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  
+  WRONG_OPTION="my_wrong_option";
+  OUTPUT_FILE="target/site/jjdoc-out-4/BasicParser4_of.html";
+}
+
+PARSER_BEGIN(BasicParser4)
+
+//package org.j-b.bp4;
+package org.jcc.bp4;
+
+public class BasicParser4 {
+
+  public static void main(String args[]) throws ParseException {
+    BasicParser4 parser = new BasicParser4(System.in);
+    parser.Input();
+  }
+
+}
+
+PARSER_END(BasicParser4)
+
+void Input() :
+{}
+{
+  MatchedBraces() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBraces() :
+{}
+{
+  "{" [ MatchedBraces() ] "}"
+}

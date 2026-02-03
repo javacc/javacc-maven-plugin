@@ -1,0 +1,29 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  NAMESPACE = "BP7";
+  
+  CODE_GENERATOR="C#";
+  JCC=true;
+  CSS="src/main/resources/my_css2";
+}
+
+PARSER_BEGIN(BasicParser7)
+
+PARSER_END(BasicParser7)
+
+void Input() :
+{}
+{
+  WrongMatchedBraces() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBraces() :
+{}
+{
+  "{" [ MatchedBraces() ] "}"
+}

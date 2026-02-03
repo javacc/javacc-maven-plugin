@@ -1,0 +1,1 @@
+Unused file, in an non empty directory but without grammar, for tests coverage

@@ -1,0 +1,29 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  NAMESPACE = "ΒΠ8";
+  
+  CODE_GENERATOR="C#";
+  XTEXT=true;
+  BNF=true;
+}
+
+PARSER_BEGIN(BasîcPãrser8)
+
+PARSER_END(BasîcPãrser8)
+
+void Ïnput() :
+{}
+{
+  MatchedBracës() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBracës() :
+{}
+{
+  "«" [ MatchedBracës() ] "»"
+}

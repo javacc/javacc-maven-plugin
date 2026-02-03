@@ -1,0 +1,35 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+}
+
+PARSER_BEGIN(BasicParserX)
+
+package org.f.bpx;
+
+public class BasicParserX {
+
+  public static void main(String args[]) throws ParseException {
+    BasicParserX parser = new BasicParserX(System.in);
+    parser.Input();
+  }
+
+}
+
+PARSER_END(BasicParserX)
+
+void Input() :
+{}
+{
+  MatchedBraces() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBraces() :
+{}
+{
+  "{" [ MatchedBraces() ] "}"
+}

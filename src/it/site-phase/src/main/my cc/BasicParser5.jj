@@ -1,0 +1,38 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  
+  XTEXT=true;
+  CSS="src/main/resources/my_css2";
+}
+
+PARSER_BEGIN(BasicParser5)
+
+package org.jcc.bp5;
+
+public class BasicParser5 {
+
+  public static void main(String args[]) throws ParseException {
+    BasicParser5 parser = new BasicParser5(System.in);
+    parser.Input();
+  }
+
+}
+
+PARSER_END(BasicParser5)
+
+void Input() :
+{}
+{
+  MatchedBraces() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBraces() :
+{}
+{
+  "{" [ MatchedBraces() ] "}"
+}

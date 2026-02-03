@@ -1,20 +1,30 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+ * All rights reserved.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.javacc.mojo;
 
@@ -22,246 +32,322 @@ import java.io.File;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
  * This bean holds some output related information about a JavaCC grammar file.<br>
  * It assists in determining the exact output location for the generated parser file.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
  */
 class GrammarInfo {
-
-  /** The absolute path to the base directory in which the grammar file resides. */
+  
+  /** The logger. */
+  private final Log log;
+  
+  /**
+   * The absolute path to the base directory in which the grammar file resides; must not be null.
+   */
   private final File sourceDirectory;
-
+  
   /**
-   * The path to the grammar file (relative to its source directory, e.g. <code>grammars/MyParser.jj
-   * </code>).
+   * The path to the grammar file, relative to its source directory (e.g. <code>grammars/MyParser.jj
+   * </code>); must not be null.
    */
-  private final String grammarFile;
-
-  /** The declared package for the generated parser (e.g. <code>org.apache</code>). */
-  private final String parserPackage;
-
+  final String grammarFile;
+  
   /**
-   * The path to the directory of the parser package (relative to a source root directory, e.g.
-   * <code>org/apache</code>).
+   * The declared package for the generated parser (e.g. <code>org.javacc.mypkg</code>) if any (and
+   * if the language supports this feature), or the empty string if none, or null if not needed.
    */
-  private final String parserDirectory;
-
-  /** The simple name of the generated parser (e.g. <code>MyParser</code>). */
-  private final String parserName;
-
+  private String parserPackage = null;
+  
   /**
-   * The path to the generated parser file (relative to a source root directory, e.g. <code>
-   * org/apache/MyParser.java</code>).
+   * The path to the sub directory of the generated parser (e.g. if the language supports the
+   * "package" or "namespace" feature), relative to an output directory that will be registered as a
+   * source root directory (e.g. <code>org/javacc/mypkg</code>), terminated by the file separator,
+   * or the empty string if none, or null if not needed.
    */
-  private final String parserFile;
-
+  private String parserSubDirectory = null;
+  
+  /** The simple name of the generated parser (e.g. <code>MyParser</code>); must not be null. */
+  private String parserName = "";
+  
+  /** The name of the main generated file, of null if not needed. */
+  private String mainGeneratedFile = null;
+  
+  /**
+   * The regex to find the package name.<br>
+   * Allows invalid package names (like <code>a-b.0.*</code>), but allows valid ones with non ASCII
+   * characters (like <code>org.jcc.ßπ6</code> or <code>org.jcc.ß\u03c06</code>).<br>
+   * It constrains that there is a line starting with the word <code>package</code> but it does not
+   * ensure that it is not inside a block comment like:
+   *
+   * <pre>
+   * &#47;&#42;
+   *  * package a.b.c;
+   * &#42;&#47;
+   * package d.e.f;
+   * </pre>
+   */
+  private static final String packageDeclaration = "^package\\s+([^\\.;]+(\\.[^\\.;]+)*)\\s*;";
+  
+  /**
+   * The regex to find the parser name.<br>
+   * It constrains that there is a line starting with the word <code>PARSER_BEGIN</code> but it does
+   * not ensure that it is not inside a block comment like:
+   *
+   * <pre>
+   * &#47;&#42;
+   *  * PARSER_BEGIN(p);
+   * &#42;&#47;
+   * PARSER_BEGIN(q);
+   * </pre>
+   */
+  private static final String parserBegin = "^PARSER_BEGIN\\s*\\(\\s*([^\\s\\)]+)\\s*\\)";
+  
+  /** JavaCC file extension. */
+  public static final String JJ_EXT = ".jj";
+  
   /**
    * Creates a new info from the specified grammar file.
    *
-   * @param sourceDir The absolute path to the base directory in which the grammar file resides,
-   *     must not be <code>null</code>.
-   * @param inputFile The path to the grammar file (relative to the source directory), must not be
-   *     <code>null</code>.
-   * @throws IOException If reading the grammar file failed.
+   * @param lg - the logger
+   * @param lang - the language to generate the parser for
+   * @param enc - the grammar file encoding
+   * @param sourceDir - the absolute path (not checked) to the base directory in which the grammar
+   *          file resides, must not be <code>null</code>
+   * @param inputFile - the path to the grammar file (relative to the source directory - not
+   *          checked), must not be <code>null</code>
+   * @throws GrammarException if reading the grammar file failed, or if no parser name can be
+   *           retrieved in the grammar
    */
-  public GrammarInfo(final File sourceDir, final String inputFile) throws IOException {
-    this(Suffix.Java, sourceDir, inputFile, null);
-  }
-
-  /**
-   * Creates a new info from the specified grammar file.
-   *
-   * @param suffix TODO
-   * @param sourceDir The absolute path to the base directory in which the grammar file resides,
-   *     must not be <code>null</code>.
-   * @param inputFile The path to the grammar file (relative to the source directory), must not be
-   *     <code>null</code>.
-   * @param packageName The package name for the generated parser, may be <code>null</code> to use
-   *     the package declaration from the grammar file.
-   * @throws IOException If reading the grammar file failed.
-   */
-  public GrammarInfo(
-      final Suffix suffix, final File sourceDir, final String inputFile, final String packageName)
-      throws IOException {
-    if (!sourceDir.isAbsolute()) {
-      throw new IllegalArgumentException("source directory is not absolute: " + sourceDir);
-    }
+  public GrammarInfo(final Log lg, final Language lang, final String enc, final File sourceDir,
+      final String inputFile) throws GrammarException {
+    
+    log = lg;
     sourceDirectory = sourceDir;
-
     final File inFile = new File(inputFile);
-    if (!inFile.isAbsolute()) {
-      grammarFile = inFile.getPath();
-    } else if (inFile.getPath().startsWith(sourceDir.getPath())) {
-      grammarFile = inFile.getPath().substring(sourceDir.getPath().length() + 1);
-    } else {
-      throw new IllegalArgumentException(
-          "input file is not relative to source directory:" + inputFile);
+    grammarFile = inFile.getPath();
+    String grammar;
+    try {
+      grammar = FileUtils.fileRead(getAbsoluteGrammarFile(), enc);
     }
-
-    // NOTE: JavaCC uses the platform default encoding to read files, so must we
-    final String grammar = FileUtils.fileRead(getGrammarFile());
-
-    // TODO: Once the parameter "packageName" from the javacc mojo has been deleted, remove our
-    // parameter, too.
-    if (packageName == null) {
+    catch (final IOException e) {
+      throw new GrammarException(
+          "Error reading input file '" + inputFile + "' / '" + getAbsoluteGrammarFile() + "'", e);
+    }
+    
+    if (lang == null) {
+      log.debug("no language set, probably for a reporting goal");
+      return;
+    }
+    
+    // TODO find a better way to isolate language dependent code
+    if (lang.usesPackage) {
       parserPackage = findPackageName(grammar);
+      parserSubDirectory = parserPackage.replace('.', File.separatorChar);
+      if (parserSubDirectory.length() > 0) {
+        parserSubDirectory += File.separator;
+      }
+    } else if (lang.usesPath) {
+      parserPackage = "";
+      parserSubDirectory = inFile.getParent() == null ? "" : inFile.getParent() + File.separator;
     } else {
-      parserPackage = packageName;
+      // note-jacoco: need to wait for an ad-hoc language to set a test case for here
+      parserPackage = "";
+      parserSubDirectory = "";
     }
-
-    parserDirectory = parserPackage.replace('.', File.separatorChar);
-
-    final String name = findParserName(grammar);
-    if (name.length() <= 0) {
-      parserName = FileUtils.removeExtension(inFile.getName());
+    log.debug("parserPackage = '" + parserPackage + "', parserSubDirectory = '" + parserSubDirectory
+        + "'");
+    
+    parserName = findParserName(grammar);
+    if (parserName.length() <= 0) {
+      throw new GrammarException(
+          "No parser name found in PARSER_BEGIN(...) statement for grammar '" + inputFile + "'");
+    }
+    log.debug("parserName = '" + parserName + "'");
+    
+    if (grammarFile.endsWith(JJ_EXT)) {
+      mainGeneratedFile = parserSubDirectory + parserName + lang.extension;
     } else {
-      parserName = name;
+      mainGeneratedFile = grammarFile.substring(0, grammarFile.length() - 4) + JJ_EXT;
+      if (!grammarFile.startsWith(parserSubDirectory)) {
+        mainGeneratedFile = parserSubDirectory + mainGeneratedFile;
+      }
     }
-
-    if (parserDirectory.length() > 0) {
-      parserFile = new File(parserDirectory, parserName + "." + suffix.string()).getPath();
-    } else {
-      parserFile = parserName + "." + suffix.string();
-    }
+    
+    log.debug("mainGeneratedFile = '" + mainGeneratedFile + "'");
   }
-
+  
+  /** The compiled regex pattern to find an escaped unicode character. */
+  static final Pattern pattUni = Pattern.compile("\\\\u[0-9a-fA-F]{4}");
+  
+  /**
+   * Converts an input string with escaped unicode characters in a string without escaped unicode
+   * characters.
+   *
+   * @param input - an input string
+   * @return the original string or a new string, always without escaped unicode characters
+   */
+  public static String removeEscapedUnicodeCharacters(final String input) {
+    final Matcher matcher = pattUni.matcher(input);
+    if (!matcher.find()) {
+      return input;
+    }
+    final StringBuffer uncodedString = new StringBuffer(input.length());
+    do {
+      final String unicodeSequence = matcher.group();
+      final char unicodeChar = (char) Integer.parseInt(unicodeSequence.substring(2), 16);
+      matcher.appendReplacement(uncodedString, Character.toString(unicodeChar));
+    } while (matcher.find());
+    matcher.appendTail(uncodedString);
+    return uncodedString.toString();
+  }
+  
+  /**
+   * Creates a new GrammarInfo from the current one changing its grammar file to the corresponding
+   * <code>.jj</code> one and its source directory to a given one.
+   *
+   * @param sourceDir - the source directory
+   * @return - the new GramarInfo
+   */
+  public GrammarInfo deriveJJ(final File sourceDir) {
+    String jjFile = grammarFile.replace(parserSubDirectory, "");
+    jjFile = jjFile.substring(0, jjFile.lastIndexOf('.')) + JJ_EXT;
+    log.debug("grammarFile = '" + grammarFile + "', sourceDir = '" + sourceDir
+        + "', parserSubDirectory = '" + parserSubDirectory + "', jjFile = '" + jjFile + "'");
+    return new GrammarInfo(this, sourceDir, jjFile);
+  }
+  
+  /**
+   * Constructor for cloning an instance and change some fields.
+   *
+   * @param gi - the instance to clone
+   * @param sourceDir - the new source directory field
+   * @param gramFile - the new grammar file field
+   */
+  private GrammarInfo(final GrammarInfo gi, final File sourceDir, final String gramFile) {
+    log = gi.log;
+    sourceDirectory = sourceDir;
+    grammarFile = gi.parserSubDirectory + gramFile;
+    parserPackage = gi.parserPackage;
+    parserSubDirectory = gi.parserSubDirectory;
+    parserName = gi.parserName;
+    mainGeneratedFile = gi.mainGeneratedFile;
+  }
+  
   /**
    * Extracts the declared package name from the specified grammar file.
    *
-   * @param grammar The contents of the grammar file, must not be <code>null</code>.
-   * @return The declared package name or an empty string if not found.
+   * @param grammar - the contents of the grammar file, must not be <code>null</code>
+   * @return the declared package name or an empty string if not found
    */
   private String findPackageName(final String grammar) {
-    final String packageDeclaration = "package\\s+([^\\s.;]+(\\.[^\\s.;]+)*)\\s*;";
-    final Matcher matcher = Pattern.compile(packageDeclaration).matcher(grammar);
-    if (matcher.find()) {
-      return matcher.group(1);
-    }
-    return "";
+    final Matcher matcher = Pattern.compile(packageDeclaration, Pattern.MULTILINE).matcher(grammar);
+    return matcher.find() ? removeEscapedUnicodeCharacters(matcher.group(1)) : "";
   }
-
+  
   /**
    * Extracts the simple parser name from the specified grammar file.
    *
-   * @param grammar The contents of the grammar file, must not be <code>null</code>.
-   * @return The parser name or an empty string if not found.
+   * @param grammar - the contents of the grammar file, must not be <code>null</code>
+   * @return The parser name or an empty string if not found
    */
   private String findParserName(final String grammar) {
-    final String parserBegin = "PARSER_BEGIN\\s*\\(\\s*([^\\s\\)]+)\\s*\\)";
-    final Matcher matcher = Pattern.compile(parserBegin).matcher(grammar);
-    if (matcher.find()) {
-      return matcher.group(1);
-    }
-    return "";
+    final Matcher matcher = Pattern.compile(parserBegin, Pattern.MULTILINE).matcher(grammar);
+    return matcher.find() ? removeEscapedUnicodeCharacters(matcher.group(1)) : "";
   }
-
+  
   /**
    * Gets the absolute path to the base directory in which the grammar file resides.<br>
    * Note that this is not necessarily the parent directory of the grammar file.
    *
-   * @return The absolute path to the base directory in which the grammar file resides, never <code>
-   *     null</code>.
+   * @return the absolute path to the base directory in which the grammar file resides, never <code>
+   *     null</code>
    */
   public File getSourceDirectory() {
     return sourceDirectory;
   }
-
-  /**
-   * Gets the absolute path to the grammar file.
-   *
-   * @return The absolute path to the grammar file, never <code>null</code>.
-   */
-  public File getGrammarFile() {
-    return new File(sourceDirectory, grammarFile);
-  }
-
+  
   /**
    * Gets the path to the grammar file (relative to its source directory).
    *
-   * @return The path to the grammar file (relative to its source directory), never <code>null
-   *     </code>.
+   * @return the path to the grammar file (relative to its source directory), never <code>null
+   *     </code>
    */
-  public String getRelativeGrammarFile() {
+  public String getGrammarFile() {
     return grammarFile;
   }
-
+  
   /**
-   * Resolves the specified package name against the package name of the parser generated from this
-   * grammar.<br>
-   * To reference the parser package, the input string may use the prefix <code>*</code>.<br>
-   * For example, if the package for the parser is <code>org.apache" and the input string is "*.node
-   * </code>, the resolved package is <code>org.apache.node</code>.<br>
-   * The period after the asterisk is significant, i.e. in the previous example the input string
-   * <code>*node</code> would resolve to <code>org.apachenode</code>.
+   * Gets the absolute path to the grammar file.
    *
-   * @param packageName The package name to resolve, may be <code>null</code>.
-   * @return The resolved package name or <code>null</code> if the input string was <code>null
-   *     </code>.
+   * @return the absolute path to the grammar file, never <code>null</code>
    */
-  public String resolvePackageName(final String packageName) {
-    String resolvedPackageName = packageName;
-    if (resolvedPackageName != null && resolvedPackageName.startsWith("*")) {
-      resolvedPackageName = getParserPackage() + resolvedPackageName.substring(1);
-      if (resolvedPackageName.startsWith(".")) {
-        resolvedPackageName = resolvedPackageName.substring(1);
-      }
-    }
-    return resolvedPackageName;
+  public File getAbsoluteGrammarFile() {
+    return new File(sourceDirectory, grammarFile);
   }
-
+  
   /**
-   * Gets the declared package for the generated parser (e.g. <code>org.apache</code>).
+   * Gets the declared package for the generated parser (e.g. <code>org.javacc.mypkg</code>).
    *
-   * @return The declared package for the generated parser (e.g. <code>org.apache</code>) or an
-   *     empty string if no package declaration was found, never <code>null</code>.
+   * @return the declared package for the generated parser or an empty string if no package
+   *         declaration was found, never <code>null</code>
    */
   public String getParserPackage() {
     return parserPackage;
   }
-
+  
   /**
-   * Gets the path to the directory of the parser package (relative to a source root directory, e.g.
-   * <code>org/apache</code>).
+   * Gets the path to the sub directory of the generated parser (relative to an output directory
+   * that will be registered as a source root directory, e.g. <code>org/javacc/mypkg</code>),
+   * terminated by the file separator, or the empty string.
    *
-   * @return The path to the directory of the parser package (relative to a source root directory,
-   *     e.g. <code>org/apache</code>) or an empty string if no package declaration was found, never
-   *     <code>null
-   *     </code>.
+   * @return the path to the sub directory of the generated parser or an empty string, never <code>
+   *     null</code>
    */
-  public String getParserDirectory() {
-    return parserDirectory;
+  public String getParserSubDirectory() {
+    return parserSubDirectory;
   }
-
+  
   /**
    * Gets the simple name of the generated parser (e.g. <code>MyParser</code>)
    *
-   * @return The simple name of the generated parser (e.g. <code>MyParser</code>), never <code>null
-   *     </code>.
+   * @return the simple name of the generated parser, never <code>null</code>
    */
   public String getParserName() {
     return parserName;
   }
-
+  
   /**
-   * Gets the path to the parser file (relative to a source root directory, e.g. <code>
-   * org/apache/MyParser.java</code>).
+   * Gets the name of the main generated file.
    *
-   * @return The path to the parser file (relative to a source root directory, e.g. <code>
-   *     org/apache/MyParser.java</code>), never <code>null</code>.
+   * @return the name of the main generated file, can be <code>null</code>
    */
-  public String getParserFile() {
-    return parserFile;
+  public String getMainGeneratedFile() {
+    return mainGeneratedFile;
   }
-
+  
   /**
-   * Gets a string representation of this bean. This value is for debugging purposes only.
+   * Sets the name of the main generated file.
    *
-   * @return A string representation of this bean.
+   * @param name - the name of the main generated file, never <code>null</code>
+   */
+  public void setMainGeneratedFile(final String name) {
+    mainGeneratedFile = name;
+  }
+  
+  /**
+   * Gets a string representation of this bean (for debugging).
+   *
+   * @return a string representation of this bean
    */
   @Override
   public String toString() {
-    return getGrammarFile() + " -> " + getParserFile();
+    return getAbsoluteGrammarFile() + " -> " + getMainGeneratedFile();
   }
 }

@@ -1,0 +1,33 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+}
+
+PARSER_BEGIN(BasicParser1)
+
+public class BasicParser1 {
+
+  public static void main(String args[]) throws ParseException {
+    BasicParser1 parser = new BasicParser1(System.in);
+    parser.Input();
+  }
+
+}
+
+PARSER_END(BasicParser1)
+
+void Input() :
+{}
+{
+  MatchedBraces() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBraces() :
+{}
+{
+  "{" [ MatchedBraces() ] "}"
+}

@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+    <artifactId>it-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin.javacc.it-tests</groupId>
+  <artifactId>jtb-then-javacc-goals</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Integration Tests - jtb-then-javacc-goals</name>
+  <description>Tests checking JJTree then JavaCC default executions on parsers without errors or
+    failures.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <executions>
+
+          <execution>
+            <!-- java + utf-8 + default source and output directories + full output file name
+                 + no package in grammar nor command line -->
+            <id>jtb-eg1</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jtb</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>Eg1.jtb</include>
+              </includes>
+              <jtbCmdLineArgs>
+                <gen>-CODE_GENERATOR="Java"</gen>
+                <enc>-GRAMMAR_ENCODING="UTF-8"</enc>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/javacc"</jjod>
+                <arg>-JTB_O="${project.build.directory}/generated-sources/jtb/Eg1.jj"</arg>
+              </jtbCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + utf-8 + default source and output directories + short output file name
+                 + no package in grammar but set in command line -->
+            <id>jtb-eg2</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jtb</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>Eg2.jtb</include>
+              </includes>
+              <jtbCmdLineArgs>
+                <gen>-CODE_GENERATOR="Java"</gen>
+                <enc>-GRAMMAR_ENCODING="UTF-8"</enc>
+                <arg>-JTB_O="Eg2.jj"</arg>
+                <!-- no declared package, package set here (yes with an ë)... -->
+                <arg>-JTB_P="org.jtb_th_jcc.ëg2"</arg>
+                <!-- ...and directories must be set accordingly with the package part -->
+                <jjod>
+                  -OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/javacc/org/jtb_th_jcc/ëg2"</jjod>
+                <jtbod>-JTB_D="${project.build.directory}/generated-sources/jtb/org/jtb_th_jcc/ëg2"</jtbod>
+              </jtbCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- (java + utf-8) + default source and output directories + full output file name
+                 + package in grammar -->
+            <id>jtb-eg3</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jtb</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>Eg3.jtb</include>
+              </includes>
+              <jtbCmdLineArgs>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/javacc"</jjod>
+                <arg>
+                  -JTB_O="${project.build.directory}/generated-sources/jtb/org/jtb_th_jcc/eg3/Eg3.jj"</arg>
+              </jtbCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- (java + utf-8) + default source and output directories + short output file name
+                 + package in grammar -->
+            <id>jtb-eg4</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jtb</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>Eg4.jtb</include>
+              </includes>
+              <jtbCmdLineArgs>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/javacc"</jjod>
+                <arg>-JTB_O="Eg4.jj"</arg>
+              </jtbCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- (java + utf-8) + custom source and output directories + full output file name
+                 + package + true option -->
+            <id>jtb-eg5</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jtb</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${basedir}/src/main/my tb</sourceDirectory>
+              <includes>
+                <include>Eg5.jtb</include>
+              </includes>
+              <jtbCmdLineArgs>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/my cc"</jjod>
+                <jtbod>-JTB_D="${project.build.directory}/gen-src/my tb"</jtbod>
+                <arg>-JTB_O="${project.build.directory}/gen-src/my tb/org/jtb_th_jcc/eg5/Eg5.jj"</arg>
+                <arg>-JTB_P="org.jtb_th_jcc.eg5"</arg>
+                <arg>-do</arg>
+              </jtbCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- (java + utf-8) +  custom source and output directories + short output file name
+                 + package in grammar + non ascii chars + false option -->
+            <id>jtb-eγ6</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jtb</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${basedir}/src/main/my tb</sourceDirectory>
+              <includes>
+                <include>Eγ6.jtb</include>
+              </includes>
+              <jtbCmdLineArgs>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/my cc"</jjod>
+                <jtbod>-JTB_D="${project.build.directory}/gen-src/my tb"</jtbod>
+                <arg>-JTB_O="Eγ6.jj"</arg>
+                <arg>-do=false</arg>
+              </jtbCmdLineArgs>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- javacc after previous jtb-eg1 to jtb-eg4 + custom source dir + default output dir
+                 + no command line option -->
+            <id>javacc-eg1_4</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/generated-sources/jtb</sourceDirectory>
+              <!--              <javaccCmdLineArgs>-->
+              <!--                <gen>-CODE_GENERATOR="Java"</gen>-->
+              <!--              </javaccCmdLineArgs>-->
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- javacc after previous jtb-eg5 & jtb-eγ6 + custom source & output directories -->
+            <id>javacc-eg5_eγ6</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/gen-src/my tb</sourceDirectory>
+              <javaccCmdLineArgs>
+                <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/gen-src/my cc"</jjod>
+              </javaccCmdLineArgs>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-csharp</artifactId>
+            <version>${plexus-compiler-csharp.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <!-- for javac, overriding parent execution (with global toolchain setting) -->
+            <id>default-compile</id>
+            <configuration>
+              <includes>
+                <include>**/eg*/**/*.java</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- for javac (with specific toolchain setting)
+                  (javac 8 does not manage well imported types with non ASCII characters) -->
+            <id>javac-not-8-compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/ëg2/**/*.java</include>
+                <include>**/eγ6/**/*.java</include>
+              </includes>
+              <jdkToolchain>
+                <version>[11,)</version>
+              </jdkToolchain>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- The package-less grammars of this project produce "cannot cast ..." and other compile
+            errors caused by incoherences with the package-less grammars of some other projects
+            when these projects are configured under Eclipse with source folders and auto build
+            and when this build is run as standalone (i.e. not part of the project's build);
+           in order to leave the build without problems markers in Eclipse we add a step to
+            clean the offending generated files.
+           Note that this does not reduce the tests coverage and validity :-) -->
+      <plugin>
+        <!-- clean some of the generated files after the package phase -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>${maven-clean-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>clean-classes</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}/generated-sources/jtb</directory>
+                  <includes>
+                    <include>*.java</include>
+                  </includes>
+                </fileset>
+                <fileset>
+                  <directory>${project.build.directory}/generated-sources/javacc</directory>
+                  <includes>
+                    <include>*.java</include>
+                    <include>*.jj</include>
+                  </includes>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

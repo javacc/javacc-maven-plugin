@@ -1,0 +1,117 @@
+import java.io.*;
+import java.util.*;
+
+// just checks for presence / absence of generated / copied files;
+
+int nbErr = 0;
+try {
+    File file;
+    
+    //             all goals executions
+    file = new File( basedir, "target/generated-jjdoc" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find goals output directory: " + file);
+        nbErr++;
+    }
+    
+   //             <id>javacc-java-1-2</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasicParser1.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-1-2</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasicParser2.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-1-2</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-java-1-2.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-1-2</id>" );
+        nbErr++;
+    }
+
+    //             <id>javacc-java-3</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasicParser3.bnf" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-3</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-java-3.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-3</id>" );
+        nbErr++;
+    }
+
+    //             <id>javacc-java-4</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out-4/BasicParser4_of.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-4</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-java-4.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-java-4</id>" );
+        nbErr++;
+    }
+
+    //            <id>empty</id>
+    // nothing to document
+
+    //            <id>no-grammar</id>
+    // nothing to document
+    
+    //            <id>javacc-mycc-1</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasîcPãrser6.txt" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mycc-1</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-mycc-1.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mycc-1</id>" );
+        nbErr++;
+    }
+
+    //            <id>javacc-mycc-2</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasicParser5.xtext" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mycc-2</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-mycc-2.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-mycc-2</id>" );
+        nbErr++;
+    }
+
+    //            <id>javacc-csharp-7</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasicParser7.bnf" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-csharp-7.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp-7</id>" );
+        nbErr++;
+    }
+
+    //            <id>javacc-csharp-8</id>
+    file = new File( basedir, "target/generated-jjdoc/jjdoc-out/BasîcPãrser8.bnf" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp</id>" );
+        nbErr++;
+    }
+    file = new File( basedir, "target/generated-jjdoc/javacc-csharp-8.html" );
+    if ( !file.exists() ) {
+        System.err.println( "Could not find generated file: " + file + " for <id>javacc-csharp-8</id>" );
+        nbErr++;
+    }
+
+} catch( Throwable t ) {
+    t.printStackTrace();
+    return false;
+}
+if (nbErr > 0) return false;
+else return true;

@@ -1,37 +1,502 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
 
-	<groupId>org.javacc.plugin.javacc</groupId>
-	<artifactId>it-test-parent</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Integration Test</name>
-	<url>http://maven.apache.org</url>
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-	<properties>
-		<javacc>7.0.5</javacc>
-	</properties>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.javacc.plugin</groupId>
-				<artifactId>javacc-maven-plugin</artifactId>
-				<version>@pom.version@</version>
-				<dependencies>
-					<dependency>
-						<groupId>net.java.dev.javacc</groupId>
-						<artifactId>javacc</artifactId>
-						<version>${javacc}</version>
-					</dependency>
-					<dependency>
-						<groupId>edu.ucla.cs.compilers</groupId>
-						<artifactId>jtb</artifactId>
-						<version>1.3.2</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+  <artifactId>it-tests</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Integration Tests</name>
+  <description>Parent module for integration tests run by the maven invoker plugin or directly from
+    the command line, on an already installed plugin standard jar, that will be instrumented on the
+    fly by jacoco.</description>
+
+  <!--  <modules>-->
+  <!-- maven looks to run them in alphabetic order;
+         note that files 'invoker.properties'' play a role in each module;
+         they set goals to clean + verify (sometimes a clean must occur after package,
+         and the failures subproject build should not be marked as failed) -->
+  <!--    <module>errors</module>-->
+  <!--    <module>failures</module>-->
+  <!--    <module>javacc-goal</module>-->
+  <!--    <module>jjdoc-goal</module>-->
+  <!--    <module>jjtree-javacc-goal</module>-->
+  <!--    <module>jjtree-then-javacc-goals</module>-->
+  <!--    <module>jtb-javacc-goal</module>-->
+  <!--    <module>jtb-then-javacc-goals</module>-->
+  <!--    <module>newer-jars</module>-->
+  <!--    <module>site-phase</module>-->
+  <!--    <module>uptodate-gen</module>-->
+  <!--  </modules>-->
+
+  <!-- cannot have the plugin as its parent (because of incompatible packagings
+        maven-plugin / pom), so must be in sync with it manually (on versions) -->
+
+  <!-- run mvn help:effective-pom to display effective pom,
+          especially for configuration parameters inheritance in children -->
+
+  <properties>
+    <!-- run mvn versions:display-property-updates to display available updates;
+         note we build a maven 3 plugin, not a maven 4 one;
+         note a lot of trouble trying to find a working set of versions,
+          must not be all the latest ones...
+         run mvn dependency:tree or the plugin in debug mode
+          to see the effective versions and scopes -->
+
+    <!-- for running the plugin -->
+    <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>
+
+    <!-- for javacc dependencies used for running the plugin -->
+    <javacc.core.version>8.1.0-SNAPSHOT</javacc.core.version>
+    <javacc.cpp.version>8.1.0-SNAPSHOT</javacc.cpp.version>
+    <javacc.csharp.version>8.1.0-SNAPSHOT</javacc.csharp.version>
+    <javacc.java.version>8.1.0-SNAPSHOT</javacc.java.version>
+    <jtb.version>1.5.3-SNAPSHOT</jtb.version>
+
+    <!-- for plugins used for running the plugin on the tests -->
+    <!--    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>-->
+    <maven-antrun-plugin.version>3.2.0</maven-antrun-plugin.version>
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
+    <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-plugin-report-plugin.version>3.14.0</maven-plugin-report-plugin.version>
+    <maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
+    <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
+    <mojohaus.build-helper-maven-plugin.version>3.6.0</mojohaus.build-helper-maven-plugin.version>
+    <!-- need the fix for ConcurrentModificationException;
+         see https://github.com/codehaus-plexus/plexus-compiler/pull/443 -->
+    <!--
+    <plexus-compiler-csharp.version>2.15.0</plexus-compiler-csharp.version>-->
+    <plexus-compiler-csharp.version>2.15.1-SNAPSHOT</plexus-compiler-csharp.version>
+    <!--
+    <plexus-compiler-csharp.version>2.16.2-SNAPSHOT</plexus-compiler-csharp.version>-->
+
+    <toolchain.jdk.version>[1.8,11]</toolchain.jdk.version>
+    <!--    <toolchain.jdk.version>[11,)</toolchain.jdk.version>-->
+
+    <!--        <file.encoding>UTF-8</file.encoding>-->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <!-- phase: generate-sources -->
+        <plugin>
+          <!-- assists the build lifecyle;
+               here use goal add-source to add the csharp source folders -->
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${mojohaus.build-helper-maven-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: generate-sources -->
+        <plugin>
+          <groupId>org.javacc.plugin</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>${javacc-maven-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.javacc</groupId>
+              <artifactId>core</artifactId>
+              <version>${javacc.core.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.javacc.generator</groupId>
+              <artifactId>java</artifactId>
+              <version>${javacc.java.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.javacc.generator</groupId>
+              <artifactId>cpp</artifactId>
+              <version>${javacc.cpp.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.javacc.generator</groupId>
+              <artifactId>csharp</artifactId>
+              <version>${javacc.csharp.version}</version>
+            </dependency>
+            <dependency>
+              <!-- temporary until published in the right namespace -->
+              <!-- <groupId>edu.purdue.cs</groupId>-->
+              <groupId>edu.purdue.jtb</groupId>
+              <artifactId>jtb</artifactId>
+              <version>${jtb.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <!-- phase: compile -->
+        <plugin>
+          <!-- allows to compile C# code on different architectures with
+               different compilers/linkers -->
+          <!-- standard maven lifecycle -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-compiler-csharp</artifactId>
+              <version>${plexus-compiler-csharp.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <!-- phase: user configured -->
+        <plugin>
+          <!-- runs Ant scripts;
+               goal: run -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${maven-antrun-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: package -->
+        <plugin>
+          <!-- builds a jar file from the compiled project classes and resources;
+                usually implicit;
+               goals: jar, test-jar -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: verify -->
+        <plugin>
+          <!-- manipulates artifacts;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${maven-dependency-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: site -->
+        <plugin>
+          <!-- generates a web site for the project, including reports configured in the pom -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven-site-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- creates report files for the mojos -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-report-plugin</artifactId>
+          <version>${maven-plugin-report-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- generates reports information about the project from its pom -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>${maven-project-info-reports-plugin.version}</version>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <!-- assists the build lifecyle;
+             here use goal add-source to add the csharp source folders -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <!-- before (javacc) generate-sources! -->
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/csharp</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <!-- default values for common arguments:
+             we use tag names different to the common 'arg' one 
+              to allow easy hiding / overriding by children -->
+        <configuration>
+
+          <javaccCmdLineArgs>
+            <enc>-GRAMMAR_ENCODING="UTF-8"</enc>
+            <jjod>-OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/javacc"</jjod>
+          </javaccCmdLineArgs>
+
+          <jjtreeCmdLineArgs>
+            <jjtod>-JJTREE_OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/jjtree"</jjtod>
+          </jjtreeCmdLineArgs>
+
+          <jtbCmdLineArgs>
+            <jtbod>-d="${project.build.directory}/generated-sources/jtb"</jtbod>
+          </jtbCmdLineArgs>
+
+          <jjdocCmdLineArgs>
+            <css>-CSS="src/main/resources/my_css"</css>
+            <jjdod>-OUTPUT_DIRECTORY="${project.build.directory}/generated-jjdoc/jjdoc-out"</jjdod>
+            <!-- for showing effects on children with the common tag arg:
+                 use mvn help:effective-pom in the child projects to see the results-->
+            <arg>-OPT1=val1</arg>
+            <arg>-OPT2=val2</arg>
+          </jjdocCmdLineArgs>
+          <!-- the default; just to remember it is used only in a build phase,
+                not in the reporting site phase-->
+          <jjdocReportsDirectory>${project.build.directory}/generated-jjdoc</jjdocReportsDirectory>
+
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <!-- needed to declare one execution for javac and another for csharp (in profile) -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- for javac (with global toolchain setting) -->
+            <id>default-compile</id>
+            <configuration> </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- report dependency problems -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <goals>
+              <goal>analyze-only</goal>
+            </goals>
+            <configuration>
+              <!--              <failOnWarning>true</failOnWarning>-->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- generate web site: standard reports are disabled in the reporting sections,
+              and JJDoc reports will be enabled in sub modules -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <relativizeSiteLinks>false</relativizeSiteLinks>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+
+      <plugin>
+        <!-- creates report files for the mojos -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId> maven-plugin-report-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+            <!-- no plugin reports -->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <!-- provides many standard reports by extracting information from the pom -->
+        <groupId> org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+            <!-- no project info reports -->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
+  <profiles>
+
+    <profile>
+      <!-- enables using maven toolchains plugin to not depend of current JAVA_HOME setting;
+           implicitely activated -->
+      <id>with-toolchains</id>
+      <activation>
+        <file>
+          <exists>${env.USERPROFILE}/.m2/toolchains.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- lifecycle: build -->
+            <!-- phase: validate -->
+            <plugin>
+              <!-- allows to share consistent configuration (here jdk) across plugins;
+                   reads <userhome>/.m2/toolchains.xml -->
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-toolchains-plugin</artifactId>
+              <version>${maven-toolchains-plugin.version}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>${toolchain.jdk.version}</version>
+                </jdk>
+              </toolchains>
+            </configuration>
+            <executions>
+              <execution>
+                <id>validate-tc</id>
+                <!-- checks that toolchains requirements are met by currently
+                      configured toolchains -->
+                <goals>
+                  <goal>toolchain</goal>
+                  <!--              <goal>select-jdk-toolchain</goal>-->
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- maven-compiler-plugin with plexus-compiler-csharp:
+           2024/07: they assume the path to csc.exe is in the %PATH%; if it is not the case,
+           set a new environment variable CscCompilerDir to its path
+            (use dir /s %windir%\csc.exe and dir /s "%programfiles%\csc.exe" to find it),
+            so this profile will be activated and will set the path to the executable -->
+      <id>csc-dir-env</id>
+      <activation>
+        <property>
+          <name>env.CSCCOMPILERDIR</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>${maven-compiler-plugin.version}</version>
+              <dependencies>
+                <dependency>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-compiler-csharp</artifactId>
+                  <version>${plexus-compiler-csharp.version}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+
+        <plugins>
+          <!-- allows to compile C# code on different architectures
+                with different compilers/linkers -->
+          <!-- standard maven lifecycle -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-compiler-csharp</artifactId>
+                <version>${plexus-compiler-csharp.version}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>csharp-compile</id>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/c#</outputDirectory>
+                  <!--  debug default value is true! -->
+                  <debug>false</debug>
+                  <compilerId>csharp</compilerId>
+                  <fork>true</fork>
+                  <executable>${env.CSCCOMPILERDIR}\csc.exe</executable>
+                  <!-- compilerArguments raises a depecation warning -->
+                  <!--                  <compilerArguments>-->
+                  <!--                    <nologo>true</nologo>-->
+                  <!--                    <nowarn>0414</nowarn>-->
+                  <!--                    <utf8output>true</utf8output>-->
+                  <!--                    <target>exe</target>-->
+                  <!--                    <out>${project.artifactId}.exe</out>-->
+                  <!--                  </compilerArguments>-->
+                  <compilerArgs>
+                    <arg>-nologo:true</arg>
+                    <arg>-nowarn:0414</arg>
+                    <arg>-utf8output:true</arg>
+                    <arg>-target:exe</arg>
+                    <arg>-out:${project.artifactId}.exe</arg>
+                  </compilerArgs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+    </profile>
+  </profiles>
+
+
 </project>

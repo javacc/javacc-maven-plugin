@@ -1,34 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
 
-  http://www.apache.org/licenses/LICENSE-2.0
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <artifactId>mojo-parent</artifactId>
-    <groupId>org.codehaus.mojo</groupId>
-    <version>50</version>
-  </parent>
+  <!-- choosed to detach form mojohaus / apache hierarchy... -->
+  <!--  <parent>-->
+  <!--    <groupId>org.codehaus.mojo</groupId>-->
+  <!--    <artifactId>mojo-parent</artifactId>-->
+  <!--    <version>91</version>-->
+  <!--  </parent>-->
+  <!--  <parent>-->
+  <!--    <groupId>org.apache.maven.plugins</groupId>-->
+  <!--    <artifactId>maven-plugins</artifactId>-->
+  <!--    <version>45</version>-->
+  <!--  </parent>-->
 
   <groupId>org.javacc.plugin</groupId>
   <artifactId>javacc-maven-plugin</artifactId>
@@ -36,8 +50,9 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>JavaCC Maven Plugin</name>
-  <description>Maven 2 Plugin for processing JavaCC grammar files.</description>
-  <url>https:https://github.com/javacc/javacc-maven-plugin/</url>
+  <description>The (completely rewritten) Maven 3 Plugin for processing JavaCC/JJTree v8.1+ / JTB
+    v1.5+ grammar files.</description>
+  <url>https://github.com/javacc/javacc-maven-plugin/</url>
   <inceptionYear>2005</inceptionYear>
 
   <organization>
@@ -45,48 +60,13 @@ under the License.
     <url>https://javacc.github.io/javacc/</url>
   </organization>
 
-  <prerequisites>
-    <maven>2.0.6</maven>
-  </prerequisites>
-
-  <properties>
-    <ossrh-server-id>ossrh</ossrh-server-id>
-    <ossrh-staging>https://oss.sonatype.org/service/local/staging/deploy/maven2/</ossrh-staging>
-    <ossrh-snapshots>https://oss.sonatype.org/content/repositories/snapshots/</ossrh-snapshots>
-    <!--    <javacc>7.0.5</javacc>-->
-    <javacc.core.version>8.1.0-SNAPSHOT</javacc.core.version>
-    <javacc.cpp.version>8.1.0-SNAPSHOT</javacc.cpp.version>
-    <javacc.csharp.version>8.1.0-SNAPSHOT</javacc.csharp.version>
-    <javacc.java.version>8.1.0-SNAPSHOT</javacc.java.version>
-  </properties>
-
-  <scm>
-    <url>https://github.com/javacc/javacc-maven-plugin</url>
-    <connection>scm:git:https://github.com/javacc/javacc-maven-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/javacc/javacc-maven-plugin.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
-  <issueManagement>
-    <system>GitHub</system>
-    <url>https://github.com/javacc/javacc/issues</url>
-  </issueManagement>
-
-  <distributionManagement>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <name>Sonatype snapshot repository</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <site>
-      <id>github</id>
-      <url>scm:git:ssh://git@github.com/javacc/javacc-maven-plugin.git</url>
-    </site>
-  </distributionManagement>
+  <licenses>
+    <license>
+      <name>BSD-3-Clause License</name>
+      <url>https://opensource.org/license/bsd-3-clause</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <developers>
     <developer>
@@ -126,53 +106,230 @@ under the License.
     </developer>
 
     <developer>
-      <name>Francis André</name>
       <id>zosrothko</id>
+      <name>Francis André</name>
       <email>zosrothko AT orange.fr</email>
+      <organization>Kampbell</organization>
       <roles>
         <role>Developer</role>
       </roles>
-      <organization>Kampbell</organization>
     </developer>
 
     <developer>
       <name>Marc Mazas</name>
       <email>mazas.marc AT gmail.com</email>
       <roles>
-        <role>Developer</role>
+        <role>Developer (v3.8.x)</role>
       </roles>
     </developer>
   </developers>
 
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+  <scm>
+    <connection>scm:git:https://github.com/javacc/javacc-maven-plugin.git</connection>
+    <developerConnection> scm:git:ssh://git@github.com/javacc/javacc-maven-plugin.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/javacc/javacc-maven-plugin</url>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/javacc/javacc/issues</url>
+  </issueManagement>
+
+  <properties>
+    <!-- run mvn versions:display-property-updates to display available updates -->
+    <!-- note we build a maven 3 plugin, not a maven 4 one -->
+    <!-- note a lot of trouble trying to find a working set of versions,
+          must not be all the latest ones (sigh!); for example:
+         maven-reporting-impl.version 4.0.0 causes: error: execute() in AbstractPluginReport
+          cannot override execute() in AbstractMavenReport as overridden method is final
+         maven-plugin-report-plugin.version 3.15.2 causes loading of maven-reporting-impl
+          version 4.0.0 when running mvn site despite set to 3.2.0 -->
+    <!-- run mvn dependency:tree to see the effective versions and scopes -->
+
+    <!-- for javacc (core only needed) / jtb dependencies used for compiling the plugin code -->
+    <javacc.core.version>8.1.0-SNAPSHOT</javacc.core.version>
+    <!--    <javacc.cpp.version>8.1.0-SNAPSHOT</javacc.cpp.version>-->
+    <!--    <javacc.csharp.version>8.1.0-SNAPSHOT</javacc.csharp.version>-->
+    <!--    <javacc.java.version>8.1.0-SNAPSHOT</javacc.java.version>-->
+    <jtb.version>1.5.3-SNAPSHOT</jtb.version>
+
+    <!-- for other dependencies used for compiling the plugin code -->
+    <doxia-sink-api.version>2.0.0</doxia-sink-api.version>
+    <doxia-site-renderer.version>2.0.0</doxia-site-renderer.version>
+    <maven-api-annotations.version>4.0.0-rc-3</maven-api-annotations.version>
+    <maven-api-xml.version>4.0.0-rc-3</maven-api-xml.version>
+    <maven-artifact.version>3.9.12</maven-artifact.version>
+    <maven-core.version>3.9.12</maven-core.version>
+    <maven-model.version>3.9.12</maven-model.version>
+    <maven-plugin-api.version>3.9.12</maven-plugin-api.version>
+    <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
+    <maven-reporting-api.version>4.0.0</maven-reporting-api.version>
+    <!--    <maven-reporting-impl.version>3.2.0</maven-reporting-impl.version>-->
+    <maven-reporting-impl.version>4.0.0</maven-reporting-impl.version>
+    <maven-xml.version>4.0.0-rc-3</maven-xml.version>
+    <plexus-utils.version>4.0.2</plexus-utils.version>
+    <plexus-xml.version>3.0.1</plexus-xml.version>
+
+    <!-- for plugins used for building the plugin artefacts / reports -->
+    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
+    <maven-fluido-skin.version>2.1.0</maven-fluido-skin.version> <!-- in site.xml -->
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <maven-help-plugin.version>3.5.1</maven-help-plugin.version>
+    <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+    <maven-invoker-plugin.version>3.9.1</maven-invoker-plugin.version>
+    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-plugin-plugin.version>3.15.2</maven-plugin-plugin.version>
+    <maven-plugin-report-plugin.version>3.14.0</maven-plugin-report-plugin.version>
+    <maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
+    <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
+
+    <toolchain.jdk.version>[1.8,11]</toolchain.jdk.version>
+    <!--    <toolchain.jdk.version>[11,)</toolchain.jdk.version>-->
+    <maven.compiler.release>8</maven.compiler.release>
+    <!--    <maven.compiler.release>11</maven.compiler.release>-->
+    <!--    <toolchain.jdk.version>8</toolchain.jdk.version>-->
+    <!--    <maven.compiler.source>1.8</maven.compiler.source>-->
+    <!--    <maven.compiler.target>1.8</maven.compiler.target>-->
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <skipTests>false</skipTests>
+
+    <central.publishing.maven.plugin.version>0.9.0</central.publishing.maven.plugin.version>
+
+  </properties>
+
+  <!-- Sonatype Central Portal keeps snapshots during 90 days;
+       current available snapshots browsable at
+        https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/ -->
+
+  <!-- For projects wanting to configure this JavaCC plugin as a dependency -->
+  <!--  <repositories>-->
+  <!--    <repository>-->
+  <!--      <id>centralportal</id>-->
+  <!--      <name>Central Portal (releases)</name>-->
+  <!--      <url>https://central.sonatype.com/</url>-->
+  <!--    </repository>-->
+  <!--    <repository>-->
+  <!--      <id>centralportalsnapshots</id>-->
+  <!--      <name>Central Portal Snapshots</name>-->
+  <!--      <url>https://central.sonatype.com/repository/maven-snapshots/</url>-->
+  <!--    </repository>-->
+  <!--  </repositories>-->
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.doxia</groupId>
+        <artifactId>doxia-sink-api</artifactId>
+        <version>${doxia-sink-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${maven-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-model</artifactId>
+        <version>${maven-model.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-api</artifactId>
+        <version>${maven-plugin-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.plugin-tools</groupId>
+        <artifactId>maven-plugin-annotations</artifactId>
+        <version>${maven-plugin-annotations.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.reporting</groupId>
+        <artifactId>maven-reporting-api</artifactId>
+        <version>${maven-reporting-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.reporting</groupId>
+        <artifactId>maven-reporting-impl</artifactId>
+        <version>${maven-reporting-impl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-xml</artifactId>
+        <version>${plexus-xml.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
+
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-sink-api</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.2.1</version>
+      <artifactId>maven-core</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>3.3.9</version>
+      <scope>provided</scope>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>net.java.dev.javacc</groupId>-->
-    <!--      <artifactId>javacc</artifactId>-->
-    <!--      <version>${javacc}</version>-->
-    <!--      <scope>provided</scope>-->
-    <!--    </dependency>-->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-impl</artifactId>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <!-- dependency plugin will warn on it saying unused while building the jar,
+         but set here to runtime to avoid need to declare it as dependency in projects
+          using this plugin, like those under /src/it -->
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.javacc</groupId>
       <artifactId>core</artifactId>
@@ -180,98 +337,363 @@ under the License.
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.javacc.generator</groupId>
-      <artifactId>cpp</artifactId>
-      <version>${javacc.cpp.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.javacc.generator</groupId>
-      <artifactId>csharp</artifactId>
-      <version>${javacc.csharp.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.javacc.generator</groupId>
-      <artifactId>java</artifactId>
-      <version>${javacc.java.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>edu.ucla.cs.compilers</groupId>
+      <!--     temporary until published in the right namespace -->
+      <!--      <groupId>edu.purdue.cs</groupId>-->
+      <groupId>edu.purdue.jtb</groupId>
       <artifactId>jtb</artifactId>
-      <version>1.3.2</version>
-      <!--
-      NOTE: Only reflectively accessed to avoid dependency on Java 1.5 for compilation.
-      -->
+      <version>${jtb.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.5.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.reporting</groupId>
-      <artifactId>maven-reporting-api</artifactId>
-      <version>3.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.reporting</groupId>
-      <artifactId>maven-reporting-impl</artifactId>
-      <version>3.0.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-sink-api</artifactId>
-      <version>1.9</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-site-renderer</artifactId>
-      <version>1.9.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>plexus</groupId>
-          <artifactId>plexus-utils</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.cobertura</groupId>
-      <artifactId>cobertura</artifactId>
-      <version>2.1.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.sun</groupId>
-          <artifactId>tools</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-core</artifactId>
-      <version>1.9</version>
-    </dependency>
+
   </dependencies>
 
+  <build>
+
+    <pluginManagement>
+      <plugins>
+        <!-- standard maven lifecycles -->
+        <!-- in lifecycle order, then in phase order, then in execution order -->
+        <!-- setting all (latest) versions for all explicit & implicit plugins to ensure build
+              consistency across contributors' installations -->
+
+        <!-- lifecycle: clean -->
+        <!-- **************** -->
+
+        <!-- phase: clean -->
+        <!-- plugin: maven-clean-plugin is not used to clean /target & other files,
+              we use the maven-antrun-plugin on target clean in build.xml script
+              to centralize this cleaning
+          -->
+        <plugin>
+          <!-- removes files generated at build-time; usually implicit;
+               goals: clean -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${maven-clean-plugin.version}</version>
+        </plugin>
+
+        <!-- lifecycle: default (build) -->
+        <!-- ************************** -->
+
+        <!-- phase: validate -->
+        <!-- (toolchains is in a profile) -->
+        <plugin>
+          <!-- get info about the project or the system; usually implicit;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-help-plugin</artifactId>
+          <version>${maven-help-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- creates a Maven plugin descriptor for mojos, to include in the jar;
+               generates report files for mojos as well as the artifact metadata and 
+               generates a generic help goal
+               goals: descriptor, (addPluginArtifactMetadata), helpmojo, help  -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${maven-plugin-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: package -->
+        <plugin>
+          <!-- builds a jar file from the compiled project classes and resources;
+                usually implicit;
+               goals: jar, test-jar -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: verify -->
+        <plugin>
+          <!-- manipulates artifacts;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>${maven-dependency-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: install -->
+        <plugin>
+          <!-- copies the project artifacts to the user's local repository;
+                usually implicit;
+               goals: install, install-file, help -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${maven-install-plugin.version}</version>
+        </plugin>
+
+        <!-- phase: deploy -->
+        <plugin>
+          <!-- creates a jar archive of the source files of the current project;
+             goals: aggregate, jar, test-jar, jar-no-fork, test-jar-no-fork -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- uses the Javadoc tool to generate javadocs for the specified project;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- signs all of the project's attached artifacts with GnuPG;
+               goals: sign, sign-and-deploy-file -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${maven-gpg-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- signs all of the project's attached artifacts with GnuPG;
+               goals: sign, verify -->
+          <!--          <groupId>org.apache.maven.plugins</groupId>-->
+          <!--          <artifactId>maven-jarsigner-plugin</artifactId>-->
+          <!--          <version>${maven-jarsigner-plugin.version}</version>-->
+          <!--        </plugin>-->
+          <!-- Maven plugin that supports publishing to Central Publisher Portal;
+               goals: help, publish; see
+                https://central.sonatype.org/publish/publish-portal-maven/#ignorepublishedcomponents -->
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${central.publishing.maven.plugin.version}</version>
+        </plugin>
+
+        <!-- lifecycle: site -->
+        <!-- *************** -->
+
+        <!-- phase: site -->
+        <plugin>
+          <!-- generates a web site for the project, including reports configured in the pom -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${maven-site-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- creates report files for the mojos -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-report-plugin</artifactId>
+          <version>${maven-plugin-report-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!--  generates reports information about the project from its pom -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>${maven-project-info-reports-plugin.version}</version>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <!-- generates descriptor and help mojo -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-descriptor</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <internalJavadocBaseUrl>./apidocs/</internalJavadocBaseUrl>
+            </configuration>
+          </execution>
+          <!-- to avoid getting "mojo not used in maven 3.9.0+" -->
+          <!--          <execution>-->
+          <!--            <id>default-addPluginArtifactMetadata</id>-->
+          <!--            <goals>-->
+          <!--              <goal>addPluginArtifactMetadata</goal>-->
+          <!--            </goals>-->
+          <!--            <configuration>-->
+          <!--              <skip>true</skip>-->
+          <!--            </configuration>-->
+          <!--          </execution>-->
+          <execution>
+            <id>generate-helpmojo</id>
+            <goals>
+              <goal>helpmojo</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- report dependency problems -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>analyze</id>
+            <goals>
+              <goal>analyze-only</goal>
+            </goals>
+            <configuration>
+              <!--              <failOnWarning>true</failOnWarning>-->
+              <!-- see comment in coresponding dependency section -->
+              <ignoredUnusedDeclaredDependencies>org.codehaus.plexus:plexus-xml</ignoredUnusedDeclaredDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- specific clean of target/site -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>clean-site</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <!-- do not delete all target! -->
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}/site</directory>
+                  <useDefaultExcludes>false</useDefaultExcludes>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <!-- generate web site and JJDoc reports -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <configuration>
+          <relativizeSiteLinks>false</relativizeSiteLinks>
+        </configuration>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+  <reporting>
+    <plugins>
+
+      <plugin>
+        <!--  creates report files for the mojos -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-report-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- do not trigger forked execution of lifecyle process-classes -->
+              <report>report-no-fork</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <!-- provides many standard reports by extracting information from the pom -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <!-- uses the Javadoc tool to generate javadocs -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <minmemory>128m</minmemory>
+          <maxmemory>512</maxmemory>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- do not trigger forked execution of lifecycles
+                  generate-source and generate-test-sources -->
+              <report>javadoc-no-fork</report>
+              <report>test-javadoc-no-fork</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <configuration>
+          <dataFile>${project.build.directory}/jacoco/jacoco.exec</dataFile>
+          <footer>Integration tests coverage report</footer>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report-integration</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
   <profiles>
+
     <profile>
+      <!-- enables using maven toolchains plugin to not depend of current JAVA_HOME setting;
+           implicitely activated -->
+      <id>with-toolchains</id>
+      <activation>
+        <file>
+          <exists>${env.USERPROFILE}/.m2/toolchains.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- lifecycle: build -->
+            <!-- phase: validate -->
+            <plugin>
+              <!-- allows to share consistent configuration (here jdk) across plugins;
+                   reads <userhome>/.m2/toolchains.xml -->
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-toolchains-plugin</artifactId>
+              <version>${maven-toolchains-plugin.version}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>${toolchain.jdk.version}</version>
+                </jdk>
+              </toolchains>
+            </configuration>
+            <executions>
+              <execution>
+                <id>validate-tc</id>
+                <!-- checks that toolchains requirements are met by currently
+                      configured toolchains -->
+                <goals>
+                  <goal>toolchain</goal>
+                  <!--              <goal>select-jdk-toolchain</goal>-->
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- enables running integration tests;
+           implicitely activated unless property 'maven.test.skip' is set to 'true' -->
       <id>run-its</id>
       <activation>
         <property>
@@ -279,44 +701,123 @@ under the License.
           <value>!true</value>
         </property>
       </activation>
-      <properties>
-        <sitePluginVersion>3.3</sitePluginVersion>
-      </properties>
       <build>
         <pluginManagement>
           <plugins>
+
+            <!-- phase: initialize for prepare-agent goal,  verify for report -->
             <plugin>
+              <groupId>org.jacoco</groupId>
+              <artifactId>jacoco-maven-plugin</artifactId>
+              <version>${jacoco-maven-plugin.version}</version>
+            </plugin>
+
+            <!-- phase: integration-test -->
+            <plugin>
+              <!-- runs a set of Maven projects;
+                   goals: install, integration-test, verify, run -->
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-invoker-plugin</artifactId>
-              <version>3.2.1</version>
+              <version>${maven-invoker-plugin.version}</version>
             </plugin>
+
           </plugins>
         </pluginManagement>
+
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-install</id>
+                <goals>
+                  <goal>install</goal>
+                </goals>
+                <!-- non-standard phase (standard is install) to install the plugin standard jar
+                      before the integration tests, as they will be performed on it -->
+                <phase>pre-integration-test</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <!-- non-standard phase (standard is initialize, for unit tests),
+                      need to be after compile for integration tests -->
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <destFile>${project.build.directory}/jacoco/jacoco.exec</destFile>
+                  <classDumpDir>${project.build.directory}/jacoco/dump</classDumpDir>
+                </configuration>
+              </execution>
+              <execution>
+                <!-- can be run as a single goal with
+                      mvn org.jacoco:jacoco-maven-plugin:0.8.13:report@report
+                      (or set id to 'default-cli'' and remove '@report' -->
+                <id>report</id>
+                <!--  <phase>install</phase> -->
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <!-- non-standard phase (standard is verify, for unit tests) -->
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <dataFile>${project.build.directory}/jacoco/jacoco.exec</dataFile>
+                  <outputDirectory>${project.build.directory}/jacoco/report</outputDirectory>
+                  <excludes>
+                    <exclude>src/it/**/*</exclude>
+                    <exclude>target/**/*</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <dependencies>
-              <dependency>
-                <groupId>net.sourceforge.cobertura</groupId>
-                <artifactId>cobertura</artifactId>
-                <version>2.1.1</version>
-              </dependency>
-            </dependencies>
+            <!-- under m2e use an external maven installation, not the embeded
+            one! -->
             <configuration>
-              <ignoreFailures>true</ignoreFailures>
-              <skipInvocation>false</skipInvocation>
-              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <postBuildHookScript>verify.bsh</postBuildHookScript>
-              <settingsFile>src/it/settings.xml</settingsFile>
-              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <debug>true</debug>
+              <!-- projects will be cloned under /target/it-clone -->
+              <cloneProjectsTo>${project.build.directory}/it-clone</cloneProjectsTo>
+              <!-- run conf: see
+              https://maven.apache.org/plugins/maven-invoker-plugin/run-mojo.html#invokerPropertiesFile-->
+              <!-- default false -->
+              <!-- <debug>true</debug>-->
+              <failIfNoProjects>true</failIfNoProjects>
+              <!-- default false -->
+              <ignoreFailures>ignoreFailures.it</ignoreFailures>
+              <!-- we do not use a local repo copy as we got problems on snapshots of locally 
+                    modified plugins not preferred to remote ones (plexus-compiler-csharp)
+                <localRepositoryPath>${project.basedir}/src/it/local-repo</localRepositoryPath>
+              -->
+              <!-- * 1st opt NEEDED otherwise the (javac) compiler plugin will not properly
+                      decode non-ASCII chars despite other encoding settings; why is a mystery
+                   * 2nd opt is for jacoco (argLine set by prepare-agent) -->
+              <mavenOpts>-Dfile.encoding=UTF-8 @{argLine}</mavenOpts>
+              <projectsDirectory>src/it</projectsDirectory>
+              <postBuildHookScript>verify-files.bsh</postBuildHookScript>
+              <settingsFile>${project.basedir}/src/it/settings.xml</settingsFile>
+              <skipInvocation>${skip.it.it}</skipInvocation>
+              <!-- streamLogs default is false; true with parallelThreads mixes logs -->
+              <streamLogs>true</streamLogs>
+              <!--              <parallelThreads>4</parallelThreads>-->
             </configuration>
             <executions>
+              <!-- we do not need to install copies of dependencies, so no install goal -->
               <execution>
-                <id>integration-test</id>
+                <id>integration-test-run</id>
                 <goals>
-                  <goal>install</goal>
                   <goal>run</goal>
                 </goals>
               </execution>
@@ -325,138 +826,133 @@ under the License.
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <!-- to be used when publishing a snapshot on Sonatype Central Portal;
+           needs explicit activation -->
+      <id>snapshot</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>centralportalsnapshots</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- to be used when publishing a release on Sonatype Central Portal;
+           needs explicit activation -->
+      <id>release</id>
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <tags>
+                <tag>
+                  <name>goal</name>
+                  <placement>a</placement>
+                  <head>Goal:</head>
+                </tag>
+                <tag>
+                  <name>phase</name>
+                  <placement>a</placement>
+                  <head>Phase:</head>
+                </tag>
+                <tag>
+                  <name>threadSafe</name>
+                  <placement>a</placement>
+                  <head>Thread Safe:</head>
+                </tag>
+                <tag>
+                  <name>requiresDependencyResolution</name>
+                  <placement>a</placement>
+                  <head>Requires Dependency Resolution:</head>
+                </tag>
+                <tag>
+                  <name>requiresProject</name>
+                  <placement>a</placement>
+                  <head>Requires Project:</head>
+                </tag>
+              </tags>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <doclint>none</doclint>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <keyname>${gpg.keyname}</keyname>
+                  <!-- with Ggp4win 4.2.0 had to copy
+                       C:\Program Files (x86)\GnuPG\bin\pinentry-basic.exe to
+                       C:\Program Files (x86)\GnuPG\bin\pinentry.exe
+                       in order to get rid of error 'no pinentry' -->
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <!-- centralBaseUrl is the default https://central.sonatype.com -->
+              <!-- deploymentName is the default Deployment -->
+              <!-- outputDirectory is the default central-publishing -->
+              <!-- outputFilename is the default central-bundle.zip -->
+              <!-- outputDirectory is the default central-publishing -->
+              <!-- publishingServerId points to a server of that name in settings.xml -->
+              <publishingServerId>centralportalXXX</publishingServerId>
+              <!-- stagingDirectory is the default central-staging -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
   </profiles>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.1.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>3.0.0-M1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <doclint>none</doclint>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <tags>
-            <tag>
-              <name>goal</name>
-              <placement>a</placement>
-              <head>Goal:</head>
-            </tag>
-            <tag>
-              <name>phase</name>
-              <placement>a</placement>
-              <head>Phase:</head>
-            </tag>
-            <tag>
-              <name>threadSafe</name>
-              <placement>a</placement>
-              <head>Thread Safe:</head>
-            </tag>
-            <tag>
-              <name>requiresDependencyResolution</name>
-              <placement>a</placement>
-              <head>Requires Dependency Resolution:</head>
-            </tag>
-            <tag>
-              <name>requiresProject</name>
-              <placement>a</placement>
-              <head>Requires Project:</head>
-            </tag>
-          </tags>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>mojo-enforcer-rules</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <!--
-								<requireProperty>
-									<property>project.scm.developerConnection</property>
-									<regex>scm:git:git://github.com/.*\.git.*</regex>
-									<regexMessage>
-										ssh (scm:git:git://github.com/.*\.git) is the preferred protocol for
-                project.scm.developerConnection, current value:
-										${project.scm.developerConnection}
-									</regexMessage>
-								</requireProperty>
-								<requireProperty>
-									<property>project.scm.connection</property>
-									<regex>scm:git:https://github.com/.*\.git.*</regex>
-									<regexMessage>
-										https (scm:git:https://github.com/.*\.git) is the preferred protocol for project.scm.connection,
-                current value:
-										${project.scm.connection}
-									</regexMessage>
-								</requireProperty>
-								<requireProperty>
-									<property>project.scm.url</property>
-									<regex>https://github.com/.*</regex>
-									<regexMessage>
-										Use https://github.com/.* as project.scm.url, especially using the prefix scm:git here will lead to
-                unbrowseable links during
-										site generation, current value: ${project.scm.url}
-									</regexMessage>
-								</requireProperty>
--->
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

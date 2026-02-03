@@ -1,0 +1,35 @@
+options {
+  LOOKAHEAD = 1;
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = true;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+}
+
+PARSER_BEGIN(BasîcPãrser6)
+
+package org.jcc.ßπ6;
+
+public class BasîcPãrser6 {
+
+  public static void main(String args[]) throws ParseException {
+    BasîcPãrser6 parser = new BasîcPãrser6(System.in);
+    parser.Ïnput();
+  }
+
+}
+
+PARSER_END(BasîcPãrser6)
+
+void Ïnput() :
+{}
+{
+  MatchedBracës() ("\n"|"\r")* <EOF>
+}
+
+void MatchedBracës() :
+{}
+{
+  "«" [ MatchedBracës() ] "»"
+}

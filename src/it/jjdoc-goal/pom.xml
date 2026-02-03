@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
+    <artifactId>it-tests</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.javacc.plugin.javacc-maven-plugin.javacc.it-tests</groupId>
+  <artifactId>jjdoc-goal</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Integration Tests - jjdoc-goal</name>
+  <description>Tests checking JJDoc executions on different grammars, as standalone goals.</description>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.javacc.plugin</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+
+        <!-- here in the build section (called by mvn install for example)
+              we use the direct goal to produce the jjdocs,
+              so with multiple executions we can define different configurations -->
+
+        <executions>
+
+          <execution>
+            <!-- java + default source and output directories;
+                 parameter invalid value changed to default -->
+            <id>javacc-java-1-2</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/*3.jtb</exclude>
+                <exclude>**/*4.jj</exclude>
+              </excludes>
+              <!-- wrong values will be changed to 'first' -->
+              <failOnGrammarError>wrong-value</failOnGrammarError>
+              <failOnProcessorError>wrong-value</failOnProcessorError>
+              <!-- here we specify nothing, so parent's arguments are in second place
+                    and the child's' one arg hide the 2 parent's ones arg -->
+              <jjdocCmdLineArgs>
+                <arg>-WRONG_OPTION="my_wrong_option"</arg>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-java-1-2</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + default source and output directories -->
+            <id>javacc-java-3</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/*1.jj</exclude>
+                <exclude>**/*2.jjt</exclude>
+                <exclude>**/*4.jj</exclude>
+              </excludes>
+              <!-- here we specify nothing, so parent's arguments are in second place
+                    so we'll have css2 (child) then css (parent) and jjdoc will warn
+                    about the duplicated css option and take the last one (the parent!)
+                    and about the parent's unknown options arg -->
+              <jjdocCmdLineArgs>
+                <arg>-BNF=true</arg>
+                <css2>-CSS="src/main/resources/my_css2"</css2>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-java-3</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + default source and output directories -->
+            <id>javacc-java-4</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <exclude>**/*1.jj</exclude>
+                <exclude>**/*2.jjt</exclude>
+                <exclude>**/*3.jtb</exclude>
+              </excludes>
+              <!-- here we override parent's arguments to get rid of all of them,
+                    so no css nor parent's arg;
+                   JJDoc should not change the output file extension (despite # from format option) -->
+              <jjdocCmdLineArgs combine.self="override">
+                <arg>-JCC=true</arg>
+                <arg>
+                  -OUTPUT_FILE="${project.build.directory}/generated-jjdoc/jjdoc-out-4/BasicParser4_of.html"</arg>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-java-4</jjdocReportsPage>
+              <!-- wrong parameter will be ignored -->
+              <jjdocWrongParam>${project.build.directory}/jjdoc-out</jjdocWrongParam>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom (empty & relative & not canonical) source and
+                  output directories -->
+            <id>empty</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <!-- a sourceDirectory relative to ${basedir} and not canonical -->
+              <sourceDirectories>
+                <sourceDirectory>../jjdoc-goal/src/main/empty</sourceDirectory>
+              </sourceDirectories>
+              <!-- here we specify nothing, so parent's arguments are in second place
+                    and may be hidden (so we have css but not the 2 arg) -->
+              <jjdocCmdLineArgs>
+                <arg>-ONE_TABLE=false</arg>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-empty</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom (no grammar & relative & not canonical) source and
+                  output directories -->
+            <id>no-grammar</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <!-- a sourceDirectory relative to ${basedir} and not canonical -->
+              <sourceDirectories>
+                <sourceDirectory>../jjdoc-goal/src/main/no-grammar</sourceDirectory>
+              </sourceDirectories>
+              <jjdocReportsPage>javacc-no-grammar</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom valid source and output directories (with space in them) -->
+            <id>javacc-mycc-1</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <!-- just to add test cases -->
+              <includes>
+                <include>**/*.jj</include>
+              </includes>
+              <excludes>
+                <exclude>**/*5.jj</exclude>
+              </excludes>
+              <sourceDirectories>
+                <sourceDirectory>${basedir}/src/main/my cc</sourceDirectory>
+              </sourceDirectories>
+              <!-- here we specify nothing, so parent's arguments are in second place
+                    and all are hidden (css and arg) -->
+              <jjdocCmdLineArgs>
+                <arg>-ONE_TABLE=false</arg>
+                <arg>-TEXT=true</arg>
+                <css>-CSS="src/main/resources/my_css2"</css>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-mycc-1</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- java + custom valid source and output directories (with space in them),
+            in them), duplication of part of previous execution to test uptodate case -->
+            <id>javacc-mycc-2</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <!-- just to add test cases -->
+              <includes>
+                <include>**/*.jj</include>
+              </includes>
+              <excludes>
+                <exclude>**/*6.jj</exclude>
+              </excludes>
+              <sourceDirectories>
+                <sourceDirectory>${basedir}/src/main/my cc</sourceDirectory>
+              </sourceDirectories>
+              <!-- here we append (at all levels!) parent's arguments to keep them,
+                    but we get the same behavior as with specifying nothing -->
+              <jjdocCmdLineArgs combine.parent="append">
+                <arg combine.parent="append">-XTEXT=true</arg>
+                <css combine.parent="append">-CSS="src/main/resources/my_css2"</css>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-mycc-2</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- C# + custom source directory and default output directory -->
+            <!-- ignored processor error:
+                 1 processor successful (BasîcPãrser8.jj) and
+                 1 processor error (missing production in BasicParser7.jj) -->
+            <id>javacc-csharp-7</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <!--              <includes>-->
+              <!--                <include>**/*7.jj</include>-->
+              <!--              </includes>-->
+              <!-- non-canonical path -->
+              <failOnProcessorError>ignore</failOnProcessorError>
+              <sourceDirectories>
+                <sourceDirectory>${basedir}/src/../src/main/csharp</sourceDirectory>
+              </sourceDirectories>
+              <!-- here we append (at top level!) parent's arguments to keep them,
+                    but we get the same behavior as with specifying nothing -->
+              <jjdocCmdLineArgs combine.parent="append">
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <arg>-JCC=true</arg>
+                <css>-CSS="src/main/resources/my_css2"</css>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-csharp-7</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- C# + custom source directory and default output directory -->
+            <!-- ignored invalid plugin configuration -->
+            <id>javacc-csharp-8</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>jjdoc</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*8.jj</include>
+              </includes>
+              <failOnPluginError>false</failOnPluginError>
+              <!-- non-canonical path -->
+              <sourceDirectories>
+                <sourceDirectory>${basedir}/src/../src/main/csharp</sourceDirectory>
+              </sourceDirectories>
+              <!-- here we append (at bottom level!) parent's arguments to keep them,
+                    but we get the same behavior as with specifying nothing;
+                   JJDoc should choose last format -->
+              <jjdocCmdLineArgs>
+                <gen>-CODE_GENERATOR="C#"</gen>
+                <arg>-XTEXT=true</arg>
+                <arg>-BNF=true</arg>
+                <css combine.parent="append">-CSS="src/main/resources/my_css2"</css>
+              </jjdocCmdLineArgs>
+              <jjdocReportsPage>javacc-csharp-8</jjdocReportsPage>
+            </configuration>
+          </execution>
+
+          <execution>
+            <!-- skipped execution, for tests coverage -->
+            <id>skipped</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
