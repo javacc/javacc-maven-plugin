@@ -221,13 +221,13 @@ public abstract class AbstractPluginReport extends AbstractMavenReport {
     for (final File dir : sourceDirectories) {
       final String[] files = dir.list();
       if (files != null && files.length > 0) {
-        getLog().debug("canGenerateReport() on sourceDirectories '" + displaySourceDirectories()
-            + "' returns true");
+        getLog().debug("canGenerateReport() on sourceDirectories '"
+            + displayDirectories(sourceDirectories) + "' returns true");
         return true;
       }
     }
-    getLog().debug("canGenerateReport() on sourceDirectories '" + displaySourceDirectories()
-        + "' returns false");
+    getLog().debug("canGenerateReport() on sourceDirectories '"
+        + displayDirectories(sourceDirectories) + "' returns false");
     return false;
   }
   
@@ -271,7 +271,7 @@ public abstract class AbstractPluginReport extends AbstractMavenReport {
     if (grammarInfos == null //
         || grammarInfos.size() == 0) {
       String msg = "No grammars to process in source directories '";
-      msg += displaySourceDirectories();
+      msg += displayDirectories(sourceDirectories);
       msg += "'";
       getLog().info(msg);
       return;
@@ -395,7 +395,7 @@ public abstract class AbstractPluginReport extends AbstractMavenReport {
     /* sourceDirectories */
     // here it can be null; if so it will be initialized to a default value by each processor;
     // and if not null, maven internals seems to always convert relative paths to an absolute ones
-    getLog().debug("sourceDirectories is '" + displaySourceDirectories() + "'");
+    getLog().debug("sourceDirectories is '" + displayDirectories(sourceDirectories) + "'");
     if (sourceDirectories != null) {
       for (final File dir : sourceDirectories) {
         if (!dir.exists()) {
@@ -457,7 +457,7 @@ public abstract class AbstractPluginReport extends AbstractMavenReport {
    * @throws GrammarException if some grammar file could not be read or parsed
    */
   protected List<GrammarInfo> scanForGrammars() throws GrammarException {
-    getLog().debug("Scanning for grammars in '" + displaySourceDirectories() + "'");
+    getLog().debug("Scanning for grammars in '" + displayDirectories(sourceDirectories) + "'");
     final GrammarDirectoryScanner gds = //
         new GrammarDirectoryScanner(getLog(), null, null);
     gds.dsSetExcludes(excludes);
@@ -502,21 +502,22 @@ public abstract class AbstractPluginReport extends AbstractMavenReport {
   protected abstract void processGrammar(GrammarInfo grammarInfo) throws ProcessorException;
   
   /**
-   * @return the string of the comma separated list of source directories
+   * @param directories - a list of directories
+   * @return the string of the comma separated list of directories
    */
-  protected String displaySourceDirectories() {
-    if (sourceDirectories == null) {
+  protected static String displayDirectories(final List<File> directories) {
+    if (directories == null) {
       return null;
     }
     String msg = "";
-    for (int i = 0; i < sourceDirectories.size(); i++) {
+    for (int i = 0; i < directories.size(); i++) {
       try {
-        msg += sourceDirectories.get(i).getCanonicalPath();
+        msg += directories.get(i).getCanonicalPath();
       }
       catch (final IOException e) {
-        msg += "IOException on element " + " of sourceDirectories";
+        msg += "IOException on element of sourceDirectories";
       }
-      if (i < sourceDirectories.size() - 1) {
+      if (i < directories.size() - 1) {
         msg += ", ";
       }
     }

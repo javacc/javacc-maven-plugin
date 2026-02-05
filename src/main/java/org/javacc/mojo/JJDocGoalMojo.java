@@ -42,16 +42,31 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * The <b>jjdoc</b> goal, for producing documentation for a JavaCC / JJTree / JTB grammar.<br>
+ * It is used indirectly under the hood when using the plugin as a reporting plugin, triggered by
+ * the Maven site plugin, producing JJDoc reports. In that case there can be only one execution and
+ * one configuration defining the source directories and other parameters.<br>
+ * It can also be used directly as a standalone goal, as a build plugin, if one wants more control,
+ * for example for multiple executions with different configurations with different sets of source
+ * directories and other parameters.<br>
  * It searches the source directories for all grammar files (those included and not excluded) and
  * runs JJDoc once for each file it finds, producing output files of the format set through the
- * JJDoc options.<br>
- * Each of these output files, along with an <code>index.html</code> file will be placed in the site
- * sub directory (<code>target/site/jjdoc</code>), and a link will be created in the "Project
- * Reports" menu of the generated site.<br>
- * It can also be used as a standalone goal, if one does not need Maven reports.
+ * JJDoc options, and of names set through JJDoc options <code>OUTPUT_DIRECTORY</code> and
+ * <code>OUTPUT_FILE</code>.<br>
+ * It also produces, for each execution, an HTML "index" file named through the plugin parameter
+ * <code>jjdocReportsPage</code> containing a table with the hyperlinks for the grammar file name to
+ * its corresponding generated JJDoc document, in a directory set by a plugin parameter
+ * <code>jjdocReportsDirectory</code> if used in a build plugin or by the Maven site plugin
+ * parameter <code>outputDirectory</code> if used in a reporting plugin.<br>
+ * And finally, if used in a reporting plugin, the Maven site plugin will create a menu entry to the
+ * HTML "index" page in the "Project Documentation / Project Reports" menu of the site.
  * <p>
- * Detailed information about the JavaCC options can be found on the
- * <a href="https://javacc.github.io/javacc/">JavaCC website</a>.<br>
+ * Detailed information about the JJDoc options can be found on the
+ * <a href="https://javacc.github.io/javacc/documentation/jjdoc.html">JJDoc documentation
+ * page</a>.<br>
+ * Examples can be found in the integration tests <a href=
+ * "https://github.com/javacc/javacc-maven-plugin/tree/master/src/it/jjdoc-goal">jjdoc-goal</a> and
+ * <a href=
+ * "https://github.com/javacc/javacc-maven-plugin/tree/master/src/it/site-phase">site-phase</a>.<br>
  * The code repositories can be found within <a href="https://github.com/javacc">JavaCC at
  * GitHub</a> and <a href="https://github.com/jtb-javacc">JTB at GitHub</a>.
  *
@@ -163,10 +178,10 @@ public class JJDocGoalMojo extends AbstractPluginReport {
       }
     }
     if (custom) {
-      getLog().debug("custom sourceDirectories is '" + displaySourceDirectories() + "'");
+      getLog().debug("custom sourceDirectories is '" + displayDirectories(sourceDirectories) + "'");
     } else {
-      getLog().debug(
-          "no custom sourceDirectories, so initialized to '" + displaySourceDirectories() + "'");
+      getLog().debug("no custom sourceDirectories, so initialized to '"
+          + displayDirectories(sourceDirectories) + "'");
     }
     getLog().debug("jjdocReportsPage is '" + jjdocReportsPage + "'");
     getLog().debug("jjdocReportsDirectory is '" + jjdocReportsDirectory + "'");

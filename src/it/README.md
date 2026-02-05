@@ -26,6 +26,7 @@ Different `.jj` grammars to be processed by the `javacc` goal, producing errors 
 
 Different `.jj` grammars `BasicParserN.jj` to be processed by the `javacc` goal; combinations of:
 - Java & C#
+- valid & invalid plugin and processor parameters
 - Maven standard and non standard (canonical and non canonical) source and output directories
 - with/without package for Java or with/without sub directory for C#
 - ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
@@ -34,6 +35,7 @@ Different `.jj` grammars `BasicParserN.jj` to be processed by the `javacc` goal;
 
 Different `.jjt` grammars `Simple0N.jjt` to be processed by the `jjtree-javacc` goal; combinations of:
 - Java & C#
+- valid & invalid plugin and processor parameters
 - Maven standard and non standard (canonical and non canonical) source and output directories
 - with/without package for Java or with/without sub directory for C#
 - ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
@@ -43,6 +45,7 @@ Different `.jjt` grammars `Simple0N.jjt` to be processed by the `jjtree-javacc` 
 
 Different `.jjt` grammars `SimpleN.jjt` to be processed by the `jjtree` goal in a first execution, then by the `javacc` goal in a second one; combinations of:
 - Java & C#
+- valid & invalid plugin and processor parameters
 - Maven standard and non standard (canonical and non canonical) source and output directories
 - with/without package for Java or with/without sub directory for C#
 - ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
@@ -52,6 +55,7 @@ Different `.jjt` grammars `SimpleN.jjt` to be processed by the `jjtree` goal in 
 
 Different `.jtb` grammars `Eg0N.jtb` to be processed by the `jtb-javacc` goal; combinations of:
 - Java
+- valid & invalid plugin and processor parameters
 - Maven standard and non standard (canonical and non canonical) source and output directories
 - with/without package
 - ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
@@ -61,6 +65,7 @@ Different `.jtb` grammars `Eg0N.jtb` to be processed by the `jtb-javacc` goal; c
 
 Different `.jtb` grammars `EgN.jtb` to be processed by the `jtb` goal in a first execution, then by the `javacc` goal in a second one; combinations of:
 - Java
+- valid & invalid plugin and processor parameters
 - Maven standard and non standard (canonical and non canonical) source and output directories
 - with/without package
 - ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
@@ -70,6 +75,18 @@ Different `.jtb` grammars `EgN.jtb` to be processed by the `jtb` goal in a first
 
 Different `.jj` grammars `BasicParserN.jj` to be processed by the `jjdoc` goal; combinations of:
 - Java & C#
+- valid & invalid plugin and processor parameters
 - Maven standard and non standard (canonical and non canonical) source and output directories
 - with/without package for Java or with/without sub directory for C#
 - ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
+- skipped execution
+
+### site-phase
+
+Different `.jj` grammars `BasicParserN.jj` to be processed by the reporting pluging and by a `jjdoc` goal execution; combinations of:
+- Java & C#
+- valid & invalid plugin and processor parameters
+- Maven non standard (canonical and non canonical) source and output directories
+- with/without package for Java or with/without sub directory for C#
+- ASCII and non ASCII identifiers (parser names, packages, namespaces) and tokens string literals
+- unknown directory

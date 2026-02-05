@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025-2026, Marc Mazas <mazas.marc@gmail.com>.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the names of the copyright holders nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.javacc.plugin</groupId>
+  <artifactId>javacc-maven-plugin-parent</artifactId>
+  <version>3.8.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>JavaCC Maven Plugin parent</name>
+  <description>The parent pom for the JavaCC Maven Plugin, defining common properties and profiles,
+    for building and running the plugin, used by the plugin pom and the integration tests pom.</description>
+
+  <!-- run mvn install / deploy -Psnapshot / deploy -Prelease on this pom
+        after changes to let the children use them -->
+
+  <properties>
+    <!-- run mvn versions:display-property-updates to display available updates -->
+    <!-- note we build a maven 3 plugin, not a maven 4 one -->
+    <!-- note a lot of trouble trying to find a working set of versions -->
+    <!-- run mvn dependency:tree to see the effective versions and scopes -->
+
+    <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>
+    <javacc.version>8.1.0-SNAPSHOT</javacc.version>
+    <!-- for javacc (core only needed) / jtb dependencies used for compiling the plugin code -->
+    <javacc.core.version>${javacc.version}</javacc.core.version>
+    <jtb.version>1.5.3-SNAPSHOT</jtb.version>
+    <!-- for java / csharp dependencies used for running the plugin in the integration tests -->
+    <javacc.cpp.version>${javacc.version}</javacc.cpp.version>
+    <javacc.csharp.version>${javacc.version}</javacc.csharp.version>
+    <javacc.java.version>${javacc.version}</javacc.java.version>
+
+    <!-- for other dependencies used for compiling the plugin code -->
+    <doxia-sink-api.version>2.0.0</doxia-sink-api.version>
+    <doxia-site-renderer.version>2.0.0</doxia-site-renderer.version>
+    <maven-api-annotations.version>4.0.0-rc-3</maven-api-annotations.version>
+    <maven-api-xml.version>4.0.0-rc-3</maven-api-xml.version>
+    <maven-artifact.version>3.9.12</maven-artifact.version>
+    <maven-core.version>3.9.12</maven-core.version>
+    <maven-model.version>3.9.12</maven-model.version>
+    <maven-plugin-api.version>3.9.12</maven-plugin-api.version>
+    <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
+    <maven-reporting-api.version>4.0.0</maven-reporting-api.version>
+    <maven-reporting-impl.version>4.0.0</maven-reporting-impl.version>
+    <maven-xml.version>4.0.0-rc-3</maven-xml.version>
+    <plexus-utils.version>4.0.2</plexus-utils.version>
+    <plexus-xml.version>3.0.1</plexus-xml.version>
+
+    <!-- for plugins used for building the plugin artefacts / reports -->
+    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+    <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
+    <maven-fluido-skin.version>2.1.0</maven-fluido-skin.version> <!-- in site.xml -->
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+    <maven-help-plugin.version>3.5.1</maven-help-plugin.version>
+    <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+    <maven-invoker-plugin.version>3.9.1</maven-invoker-plugin.version>
+    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-plugin-plugin.version>3.15.2</maven-plugin-plugin.version>
+    <maven-plugin-report-plugin.version>3.14.0</maven-plugin-report-plugin.version>
+    <maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
+    <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
+
+    <!-- for plugins used for running the plugin in the integration tests -->
+    <maven-antrun-plugin.version>3.2.0</maven-antrun-plugin.version>
+    <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+    <mojohaus.build-helper-maven-plugin.version>3.6.0</mojohaus.build-helper-maven-plugin.version>
+    <plexus-compiler-csharp.version>2.16.2</plexus-compiler-csharp.version>
+
+    <!-- for compilers -->
+    <toolchain.jdk.version>[1.8,11]</toolchain.jdk.version>
+    <!--    <toolchain.jdk.version>[11,)</toolchain.jdk.version>-->
+    <maven.compiler.release>8</maven.compiler.release>
+    <!--    <maven.compiler.release>11</maven.compiler.release>-->
+    <!--    <toolchain.jdk.version>8</toolchain.jdk.version>-->
+    <!--    <maven.compiler.source>1.8</maven.compiler.source>-->
+    <!--    <maven.compiler.target>1.8</maven.compiler.target>-->
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <skipTests>false</skipTests>
+
+    <central.publishing.maven.plugin.version>0.9.0</central.publishing.maven.plugin.version>
+
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <!-- lifecycle: default (build) -->
+        <!-- ************************** -->
+
+        <!-- phase: deploy -->
+        <plugin>
+          <!-- creates a jar archive of the source files of the current project;
+             goals: aggregate, jar, test-jar, jar-no-fork, test-jar-no-fork -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- uses the Javadoc tool to generate javadocs for the specified project;
+               goals: (many, not listed) -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- signs all of the project's attached artifacts with GnuPG;
+               goals: sign, sign-and-deploy-file -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${maven-gpg-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <!-- signs all of the project's attached artifacts with GnuPG;
+               goals: sign, verify -->
+          <!--          <groupId>org.apache.maven.plugins</groupId>-->
+          <!--          <artifactId>maven-jarsigner-plugin</artifactId>-->
+          <!--          <version>${maven-jarsigner-plugin.version}</version>-->
+          <!--        </plugin>-->
+          <!-- Maven plugin that supports publishing to Central Publisher Portal;
+               goals: help, publish; see
+                https://central.sonatype.org/publish/publish-portal-maven/#ignorepublishedcomponents -->
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${central.publishing.maven.plugin.version}</version>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
+  </build>
+
+  <profiles>
+
+    <profile>
+      <!-- to be used when publishing a snapshot on Sonatype Central Portal;
+           needs explicit activation -->
+      <id>snapshot</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>centralportalsnapshots</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <!-- to be used when publishing a release on Sonatype Central Portal;
+           needs explicit activation -->
+      <id>release</id>
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <minmemory>128m</minmemory>
+              <maxmemory>512</maxmemory>
+              <tags>
+                <tag>
+                  <name>goal</name>
+                  <placement>a</placement>
+                  <head>Goal:</head>
+                </tag>
+                <tag>
+                  <name>phase</name>
+                  <placement>a</placement>
+                  <head>Phase:</head>
+                </tag>
+                <tag>
+                  <name>threadSafe</name>
+                  <placement>a</placement>
+                  <head>Thread Safe:</head>
+                </tag>
+                <tag>
+                  <name>requiresDependencyResolution</name>
+                  <placement>a</placement>
+                  <head>Requires Dependency Resolution:</head>
+                </tag>
+                <tag>
+                  <name>requiresProject</name>
+                  <placement>a</placement>
+                  <head>Requires Project:</head>
+                </tag>
+              </tags>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <doclint>none</doclint>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <keyname>${gpg.keyname}</keyname>
+                  <!-- with Ggp4win 4.2.0 had to copy
+                       C:\Program Files (x86)\GnuPG\bin\pinentry-basic.exe to
+                       C:\Program Files (x86)\GnuPG\bin\pinentry.exe
+                       in order to get rid of error 'no pinentry' -->
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <!--              <autoPublish>true</autoPublish>-->
+              <!--             <waitUntil>published</waitUntil>-->
+              <!-- centralBaseUrl is the default https://central.sonatype.com -->
+              <!-- deploymentName is the default Deployment -->
+              <!-- outputDirectory is the default central-publishing -->
+              <!-- outputFilename is the default central-bundle.zip -->
+              <!-- outputDirectory is the default central-publishing -->
+              <!-- publishingServerId points to a server of that name in settings.xml -->
+              <publishingServerId>centralportalXXX</publishingServerId>
+              <!-- stagingDirectory is the default central-staging -->
+            </configuration>
+          </plugin>
+          
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>

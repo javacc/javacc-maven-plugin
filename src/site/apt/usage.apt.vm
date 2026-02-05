@@ -37,21 +37,25 @@ Usage
           <artifactId>javacc-maven-plugin</artifactId>
           <version>$\{javacc.maven.plugin.version\}</version>
           <dependencies>
-            <!-- declare all used processors artifacts -->
-            <dependency>
-              <groupId>org.javacc</groupId>
-              <artifactId>core</artifactId>
-              <version>${javacc.core.version}</version>
-            </dependency>
+            <!-- declare all used generators artifacts;  the core may be omitted,
+                  as it is a dependency of the generators -->
+            <!--            <dependency>-->
+            <!--              <groupId>org.javacc</groupId>-->
+            <!--              <artifactId>core</artifactId>-->
+            <!--              <version>${javacc.core.version}</version>-->
+            <!--              <scope>runtime</scope>-->
+            <!--            </dependency>-->
             <dependency>
               <groupId>org.javacc.generator</groupId>
               <artifactId>java</artifactId>
               <version>${javacc.java.version}</version>
+              <scope>runtime</scope>
             </dependency>
             <dependency>
               <groupId>org.javacc.generator</groupId>
               <artifactId>csharp</artifactId>
               <version>${javacc.csharp.version}</version>
+              <scope>runtime</scope>
             </dependency>
             ...
           </dependencies>

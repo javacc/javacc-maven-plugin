@@ -63,7 +63,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <sourceDirectory>${basedir}/src/main/empty</sourceDirectory>
             <sourceDirectory>${basedir}/src/main/no-grammar</sourceDirectory>
             <sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
-            <sourceDirectory>${basedir}/src/main/jtb</sourceDirectory>
+            <sourceDirectory>${basedir}/src/main/../main/jtb</sourceDirectory>
             <sourceDirectory>${basedir}/src/main/my cc</sourceDirectory>
             <sourceDirectory>${basedir}/src/main/csharp</sourceDirectory>
           </sourceDirectories>

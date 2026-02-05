@@ -32,6 +32,13 @@ THE POSSIBILITY OF SUCH DAMAGE.
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.javacc.plugin</groupId>
+    <artifactId>javacc-maven-plugin-parent</artifactId>
+    <version>3.8.0-SNAPSHOT</version>
+    <relativePath>/../../parent/pom.xml</relativePath>
+  </parent>
+
   <groupId>org.javacc.plugin.javacc-maven-plugin</groupId>
   <artifactId>it-tests</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -60,57 +67,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
   <!--    <module>uptodate-gen</module>-->
   <!--  </modules>-->
 
-  <!-- cannot have the plugin as its parent (because of incompatible packagings
-        maven-plugin / pom), so must be in sync with it manually (on versions) -->
-
   <!-- run mvn help:effective-pom to display effective pom,
           especially for configuration parameters inheritance in children -->
-
-  <properties>
-    <!-- run mvn versions:display-property-updates to display available updates;
-         note we build a maven 3 plugin, not a maven 4 one;
-         note a lot of trouble trying to find a working set of versions,
-          must not be all the latest ones...
-         run mvn dependency:tree or the plugin in debug mode
-          to see the effective versions and scopes -->
-
-    <!-- for running the plugin -->
-    <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>
-
-    <!-- for javacc dependencies used for running the plugin -->
-    <javacc.core.version>8.1.0-SNAPSHOT</javacc.core.version>
-    <javacc.cpp.version>8.1.0-SNAPSHOT</javacc.cpp.version>
-    <javacc.csharp.version>8.1.0-SNAPSHOT</javacc.csharp.version>
-    <javacc.java.version>8.1.0-SNAPSHOT</javacc.java.version>
-    <jtb.version>1.5.3-SNAPSHOT</jtb.version>
-
-    <!-- for plugins used for running the plugin on the tests -->
-    <!--    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>-->
-    <maven-antrun-plugin.version>3.2.0</maven-antrun-plugin.version>
-    <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
-    <maven-dependency-plugin.version>3.9.0</maven-dependency-plugin.version>
-    <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-    <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
-    <maven-plugin-report-plugin.version>3.14.0</maven-plugin-report-plugin.version>
-    <maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
-    <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
-    <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
-    <mojohaus.build-helper-maven-plugin.version>3.6.0</mojohaus.build-helper-maven-plugin.version>
-    <!-- need the fix for ConcurrentModificationException;
-         see https://github.com/codehaus-plexus/plexus-compiler/pull/443 -->
-    <!--
-    <plexus-compiler-csharp.version>2.15.0</plexus-compiler-csharp.version>-->
-    <plexus-compiler-csharp.version>2.15.1-SNAPSHOT</plexus-compiler-csharp.version>
-    <!--
-    <plexus-compiler-csharp.version>2.16.2-SNAPSHOT</plexus-compiler-csharp.version>-->
-
-    <toolchain.jdk.version>[1.8,11]</toolchain.jdk.version>
-    <!--    <toolchain.jdk.version>[11,)</toolchain.jdk.version>-->
-
-    <!--        <file.encoding>UTF-8</file.encoding>-->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-  </properties>
 
   <build>
     <pluginManagement>
@@ -130,26 +88,32 @@ THE POSSIBILITY OF SUCH DAMAGE.
           <groupId>org.javacc.plugin</groupId>
           <artifactId>javacc-maven-plugin</artifactId>
           <version>${javacc-maven-plugin.version}</version>
+          <!-- only the used generators are needed; the core may be omitted, as it is a
+                dependency of the generators -->
           <dependencies>
-            <dependency>
-              <groupId>org.javacc</groupId>
-              <artifactId>core</artifactId>
-              <version>${javacc.core.version}</version>
-            </dependency>
+            <!--            <dependency>-->
+            <!--              <groupId>org.javacc</groupId>-->
+            <!--              <artifactId>core</artifactId>-->
+            <!--              <version>${javacc.core.version}</version>-->
+            <!--              <scope>runtime</scope>-->
+            <!--            </dependency>-->
             <dependency>
               <groupId>org.javacc.generator</groupId>
               <artifactId>java</artifactId>
               <version>${javacc.java.version}</version>
+              <scope>runtime</scope>
             </dependency>
-            <dependency>
-              <groupId>org.javacc.generator</groupId>
-              <artifactId>cpp</artifactId>
-              <version>${javacc.cpp.version}</version>
-            </dependency>
+            <!--            <dependency>-->
+            <!--              <groupId>org.javacc.generator</groupId>-->
+            <!--              <artifactId>cpp</artifactId>-->
+            <!--              <version>${javacc.cpp.version}</version>-->
+            <!--              <scope>runtime</scope>-->
+            <!--            </dependency>-->
             <dependency>
               <groupId>org.javacc.generator</groupId>
               <artifactId>csharp</artifactId>
               <version>${javacc.csharp.version}</version>
+              <scope>runtime</scope>
             </dependency>
             <dependency>
               <!-- temporary until published in the right namespace -->
@@ -342,7 +306,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <reportSets>
           <reportSet>
             <reports>
-            <!-- no plugin reports -->
+              <!-- no plugin reports -->
             </reports>
           </reportSet>
         </reportSets>
@@ -355,7 +319,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <reportSets>
           <reportSet>
             <reports>
-            <!-- no project info reports -->
+              <!-- no project info reports -->
             </reports>
           </reportSet>
         </reportSets>

@@ -670,9 +670,32 @@ public abstract class AbstractPluginMojo extends AbstractMojo {
     if (!keepIntermediateDirectory) {
       deleteIntermediateDirectories(intermediateDirectories);
     } else {
-      getLog().info(
-          "Intermediate directory(ies) '" + intermediateDirectories + "' not deleted as requested");
+      getLog().info("Intermediate directory(ies) '" + displayDirectories(intermediateDirectories)
+          + "' not deleted as requested");
     }
+  }
+  
+  /**
+   * @param directories - an array of directories
+   * @return the string of the comma separated list of directories
+   */
+  protected static String displayDirectories(final File[] directories) {
+    if (directories == null) {
+      return null;
+    }
+    String msg = "";
+    for (int i = 0; i < directories.length; i++) {
+      try {
+        msg += directories[i].getCanonicalPath();
+      }
+      catch (final IOException e) {
+        msg += "IOException on element of intermediateDirectories";
+      }
+      if (i < directories.length - 1) {
+        msg += ", ";
+      }
+    }
+    return msg;
   }
   
   /**
