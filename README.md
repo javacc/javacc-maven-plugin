@@ -296,7 +296,7 @@ This intermediate directory is deleted at the end of the execution; however, for
 
 ### Maven plugin like web site pages
 
-Web site pages in the Maven Plugin layout is generated under TODO.
+Web site pages in the Maven Plugin layout are generated [here](https://javacc.github.io/javacc-maven-plugin/).
 
 ### License
 
