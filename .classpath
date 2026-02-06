@@ -16,7 +16,7 @@
 	<classpathentry excluding="errors/|failures/|javacc-goal/|jjdoc-goal/|jjtree-javacc-goal/|jjtree-then-javacc-goals/|jtb-javacc-goal/|jtb-then-javacc-goals/|newer-jars/|site-phase/|uptodate-gen/" kind="src" path="src/it"/>
 	<classpathentry excluding="src/|target/" kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal"/>
 	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/javacc"/>
-	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/javacc-empty"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/empty"/>
 	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/my cc"/>
 	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/csharp"/>
 	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/java"/>

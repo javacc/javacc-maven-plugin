@@ -49,23 +49,23 @@ THE POSSIBILITY OF SUCH DAMAGE.
     the command line, on an already installed plugin standard jar, that will be instrumented on the
     fly by jacoco.</description>
 
-  <!--  <modules>-->
-  <!-- maven looks to run them in alphabetic order;
+  <modules>
+    <!-- maven looks to run them in alphabetic order;
          note that files 'invoker.properties'' play a role in each module;
          they set goals to clean + verify (sometimes a clean must occur after package,
          and the failures subproject build should not be marked as failed) -->
-  <!--    <module>errors</module>-->
-  <!--    <module>failures</module>-->
-  <!--    <module>javacc-goal</module>-->
-  <!--    <module>jjdoc-goal</module>-->
-  <!--    <module>jjtree-javacc-goal</module>-->
-  <!--    <module>jjtree-then-javacc-goals</module>-->
-  <!--    <module>jtb-javacc-goal</module>-->
-  <!--    <module>jtb-then-javacc-goals</module>-->
-  <!--    <module>newer-jars</module>-->
-  <!--    <module>site-phase</module>-->
-  <!--    <module>uptodate-gen</module>-->
-  <!--  </modules>-->
+    <module>errors</module>
+<!--    <module>failures</module>-->
+    <module>javacc-goal</module>
+    <module>jjdoc-goal</module>
+    <module>jjtree-javacc-goal</module>
+    <module>jjtree-then-javacc-goals</module>
+    <module>jtb-javacc-goal</module>
+    <module>jtb-then-javacc-goals</module>
+    <module>newer-jars</module>
+    <module>site-phase</module>
+    <module>uptodate-gen</module>
+  </modules>
 
   <!-- run mvn help:effective-pom to display effective pom,
           especially for configuration parameters inheritance in children -->

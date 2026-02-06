@@ -76,17 +76,17 @@ THE POSSIBILITY OF SUCH DAMAGE.
           <execution>
             <!-- java + custom (empty & relative & not canonical) source and
                   output directories -->
-            <id>javacc-java-empty</id>
+            <id>javacc-empty</id>
             <phase>generate-sources</phase>
             <goals>
               <goal>javacc</goal>
             </goals>
             <configuration>
               <!-- a sourceDirectory relative to ${basedir} and not canonical -->
-              <sourceDirectory>../javacc-goal/src/main/javacc-empty</sourceDirectory>
+              <sourceDirectory>../javacc-goal/src/main/empty</sourceDirectory>
               <javaccCmdLineArgs>
                 <gen>-CODE_GENERATOR="Java"</gen>
-                <jjod> -OUTPUT_DIRECTORY="../javacc-goal/target/gen-src/javacc-empty"</jjod>
+                <jjod> -OUTPUT_DIRECTORY="../javacc-goal/target/gen-src/empty"</jjod>
               </javaccCmdLineArgs>
               <!-- default -->
               <timestampDeltaMs>0</timestampDeltaMs>
