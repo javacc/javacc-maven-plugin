@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="target/generated-sources/plugin"/>
+	<classpathentry excluding="errors/|failures/|javacc-goal/|jjdoc-goal/|jjtree-javacc-goal/|jjtree-then-javacc-goals/|jtb-javacc-goal/|jtb-then-javacc-goals/|newer-jars/|site-phase/|uptodate-gen/" kind="src" path="src/it"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/javacc"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/javacc-empty"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/my cc"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/csharp"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/src/main/java"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/target/generated-sources/javacc"/>
+	<classpathentry kind="src" output="src/it/javacc-goal/target/classes" path="src/it/javacc-goal/target/gen-src/my cc"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/src/main/jjtree"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/src/main/my tree"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/src/main/csharp"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/src/main/java"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/target/generated-sources/jjtree"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/target/gen-src/my tree"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/target/gen-src/mytree-c#"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/target/generated-sources/javacc"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/target/gen-src/my cc"/>
+	<classpathentry kind="src" output="src/it/jjtree-javacc-goal/target/classes" path="src/it/jjtree-javacc-goal/target/gen-src/mycc-c#"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/src/main/jjtree"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/src/main/my tree"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/src/main/csharp"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/src/main/java"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/target/generated-sources/jjtree"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/target/gen-src/my tree"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/target/gen-src/mytree-c#"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/target/generated-sources/javacc"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/target/gen-src/my cc"/>
+	<classpathentry kind="src" output="src/it/jjtree-then-javacc-goals/target/classes" path="src/it/jjtree-then-javacc-goals/target/gen-src/mycc-c#"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/src/main/jtb"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/src/main/my tb"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/src/main/java"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/target/generated-sources/jtb"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/target/gen-src/my tb"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/target/generated-sources/javacc"/>
+	<classpathentry kind="src" output="src/it/jtb-javacc-goal/target/classes" path="src/it/jtb-javacc-goal/target/gen-src/my cc"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/src/main/jtb"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/src/main/my tb"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/src/main/java"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/target/generated-sources/jtb"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/target/gen-src/my tb"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/target/generated-sources/javacc"/>
+	<classpathentry kind="src" output="src/it/jtb-then-javacc-goals/target/classes" path="src/it/jtb-then-javacc-goals/target/gen-src/my cc"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/jjdoc-goal/target/classes" path="src/it/jjdoc-goal"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/site-phase/target/classes" path="src/it/site-phase"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/errors/target/classes" path="src/it/errors"/>
+	<classpathentry kind="src" output="src/it/errors/target/classes" path="src/it/errors/src/main/javacc"/>
+	<classpathentry kind="src" output="src/it/errors/target/classes" path="src/it/errors/src/main/csharp"/>
+	<classpathentry kind="src" output="src/it/errors/target/classes" path="src/it/errors/target/generated-sources/javacc"/>
+	<classpathentry excluding="gen-ko-gram-ig-fi/|gen-ko-gram-la/|read-ko-gram-ig-fi/|read-ko-gram-la/|src/|target/|wrong-cg/|wrong-output-dir/|wrong-source-dir/" kind="src" output="src/it/failures/target/classes" path="src/it/failures"/>
+	<classpathentry kind="src" output="src/it/failures/read-ko-gram-ig-fi/target/classes" path="src/it/failures/read-ko-gram-ig-fi/src/main/javacc"/>
+	<classpathentry kind="src" output="src/it/failures/read-ko-gram-ig-fi/target/classes" path="src/it/failures/read-ko-gram-ig-fi/target/generated-sources/javacc"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/newer-jars/target/classes" path="src/it/newer-jars"/>
+	<classpathentry excluding="src/|target/" kind="src" output="src/it/uptodate-gen/target/classes" path="src/it/uptodate-gen"/>
+	<classpathentry kind="lib" path="C:/Devs/GitRepo/jtb~github/lib/jtb-1.5.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
