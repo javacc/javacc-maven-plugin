@@ -445,7 +445,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
       </plugin>
 
       <plugin>
-        <!-- specific clean of target/site -->
+        <!-- specific clean of ${site.dir} -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
         <executions>
@@ -460,7 +460,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
               <excludeDefaultDirectories>true</excludeDefaultDirectories>
               <filesets>
                 <fileset>
-                  <directory>${project.build.directory}/site</directory>
+                  <directory>${site.dir}</directory>
                   <useDefaultExcludes>false</useDefaultExcludes>
                 </fileset>
               </filesets>
@@ -470,11 +470,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
       </plugin>
 
       <plugin>
-        <!-- generate web site and JJDoc reports -->
+        <!-- generate web site and JJDoc reports in ${site.dir} -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <configuration>
-          <relativizeSiteLinks>false</relativizeSiteLinks>
+          <!--          <relativizeSiteLinks>false</relativizeSiteLinks>-->
+          <outputDirectory>${site.dir}</outputDirectory>
         </configuration>
       </plugin>
 
@@ -503,6 +504,18 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <!-- provides many standard reports by extracting information from the pom -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!--              <report>index</report>-->
+              <report>summary</report>
+              <report>help</report>
+              <report>dependencies</report>
+              <report>dependency-info</report>
+              <report>dependency-management</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
 
       <!-- no javadoc report in the web site (only for Sonatype releases, in parent profile) -->
@@ -515,6 +528,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <configuration>
           <dataFile>${project.build.directory}/jacoco/jacoco.exec</dataFile>
           <footer>Integration tests coverage report</footer>
+          <title>Integration tests coverage</title>
+          <excludes>org/javacc/plugin/**</excludes>
         </configuration>
         <reportSets>
           <reportSet>
@@ -529,56 +544,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
   </reporting>
 
   <profiles>
-
-    <profile>
-      <!-- enables using maven toolchains plugin to not depend of current JAVA_HOME setting;
-           implicitely activated -->
-      <id>with-toolchains</id>
-      <activation>
-        <file>
-          <exists>${env.USERPROFILE}/.m2/toolchains.xml</exists>
-        </file>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <!-- lifecycle: build -->
-            <!-- phase: validate -->
-            <plugin>
-              <!-- allows to share consistent configuration (here jdk) across plugins;
-                   reads <userhome>/.m2/toolchains.xml -->
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-toolchains-plugin</artifactId>
-              <version>${maven-toolchains-plugin.version}</version>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-toolchains-plugin</artifactId>
-            <configuration>
-              <toolchains>
-                <jdk>
-                  <version>${toolchain.jdk.version}</version>
-                </jdk>
-              </toolchains>
-            </configuration>
-            <executions>
-              <execution>
-                <id>validate-tc</id>
-                <!-- checks that toolchains requirements are met by currently
-                      configured toolchains -->
-                <goals>
-                  <goal>toolchain</goal>
-                  <!--              <goal>select-jdk-toolchain</goal>-->
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
     <profile>
       <!-- enables running integration tests;

@@ -1,0 +1,27 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Integration tests coverage,org.javacc.mojo,AbstractProcessor,20,158,0,10,3,25,0,9,0,4
+Integration tests coverage,org.javacc.mojo,JJTreeJavaCCGoalMojo,0,319,1,17,0,66,1,16,0,8
+Integration tests coverage,org.javacc.mojo,PluginException,10,4,0,0,4,2,2,1,2,1
+Integration tests coverage,org.javacc.mojo,JJTreeArgumentsBean,0,35,0,0,0,9,0,5,0,5
+Integration tests coverage,org.javacc.mojo,JavaCCGoalMojo,2,149,1,7,0,27,1,11,0,8
+Integration tests coverage,org.javacc.mojo,JavaCCProcessor,17,49,0,4,3,10,0,5,0,3
+Integration tests coverage,org.javacc.mojo,AbstractArgumentsBean,17,283,1,21,1,45,1,13,0,3
+Integration tests coverage,org.javacc.mojo,JTBArgumentsBean,0,43,0,0,0,9,0,5,0,5
+Integration tests coverage,org.javacc.mojo,JTBProcessor,17,49,0,4,3,10,0,5,0,3
+Integration tests coverage,org.javacc.mojo,JTBJavaCCGoalMojo,8,338,2,16,1,65,2,15,0,8
+Integration tests coverage,org.javacc.mojo,Language.LanguageHelper,3,19,0,0,1,2,1,1,1,1
+Integration tests coverage,org.javacc.mojo,AbstractPluginReport,143,531,18,40,34,112,17,21,1,8
+Integration tests coverage,org.javacc.mojo,JTBGoalMojo,8,168,1,7,1,27,1,11,0,8
+Integration tests coverage,org.javacc.mojo,GrammarDirectoryScanner,22,456,1,29,3,85,1,23,0,9
+Integration tests coverage,org.javacc.mojo,JJDocProcessor,16,52,0,0,3,11,0,3,0,3
+Integration tests coverage,org.javacc.mojo,CommonException,5,9,0,0,2,4,1,2,1,2
+Integration tests coverage,org.javacc.mojo,JJTreeGoalMojo,0,151,0,8,0,27,0,12,0,8
+Integration tests coverage,org.javacc.mojo,JJTreeProcessor,17,49,0,4,3,10,0,5,0,3
+Integration tests coverage,org.javacc.mojo,ProcessorException,10,4,0,0,4,2,2,1,2,1
+Integration tests coverage,org.javacc.mojo,JavaCCArgumentsBean,0,35,0,0,0,9,0,5,0,5
+Integration tests coverage,org.javacc.mojo,Language,0,197,0,8,0,27,0,7,0,3
+Integration tests coverage,org.javacc.mojo,AbstractPluginMojo,144,1296,14,106,17,223,14,63,0,17
+Integration tests coverage,org.javacc.mojo,GrammarException,5,9,0,0,2,4,1,2,1,2
+Integration tests coverage,org.javacc.mojo,GrammarInfo,15,462,1,23,5,72,4,24,3,13
+Integration tests coverage,org.javacc.mojo,JJDocArgumentsBean,3,22,0,0,1,6,1,4,1,4
+Integration tests coverage,org.javacc.mojo,JJDocGoalMojo,40,431,8,10,7,85,9,14,2,12

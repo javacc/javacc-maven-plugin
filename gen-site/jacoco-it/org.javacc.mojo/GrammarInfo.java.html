@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GrammarInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">GrammarInfo.java</span></div><h1>GrammarInfo.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.FileUtils;
+
+/**
+ * This bean holds some output related information about a JavaCC grammar file.&lt;br&gt;
+ * It assists in determining the exact output location for the generated parser file.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ */
+class GrammarInfo {
+  
+  /** The logger. */
+  private final Log log;
+  
+  /**
+   * The absolute path to the base directory in which the grammar file resides; must not be null.
+   */
+  private final File sourceDirectory;
+  
+  /**
+   * The path to the grammar file, relative to its source directory (e.g. &lt;code&gt;grammars/MyParser.jj
+   * &lt;/code&gt;); must not be null.
+   */
+  final String grammarFile;
+  
+  /**
+   * The declared package for the generated parser (e.g. &lt;code&gt;org.javacc.mypkg&lt;/code&gt;) if any (and
+   * if the language supports this feature), or the empty string if none, or null if not needed.
+   */
+<span class="fc" id="L66">  private String parserPackage = null;</span>
+  
+  /**
+   * The path to the sub directory of the generated parser (e.g. if the language supports the
+   * &quot;package&quot; or &quot;namespace&quot; feature), relative to an output directory that will be registered as a
+   * source root directory (e.g. &lt;code&gt;org/javacc/mypkg&lt;/code&gt;), terminated by the file separator,
+   * or the empty string if none, or null if not needed.
+   */
+<span class="fc" id="L74">  private String parserSubDirectory = null;</span>
+  
+  /** The simple name of the generated parser (e.g. &lt;code&gt;MyParser&lt;/code&gt;); must not be null. */
+<span class="fc" id="L77">  private String parserName = &quot;&quot;;</span>
+  
+  /** The name of the main generated file, of null if not needed. */
+<span class="fc" id="L80">  private String mainGeneratedFile = null;</span>
+  
+  /**
+   * The regex to find the package name.&lt;br&gt;
+   * Allows invalid package names (like &lt;code&gt;a-b.0.*&lt;/code&gt;), but allows valid ones with non ASCII
+   * characters (like &lt;code&gt;org.jcc.ßπ6&lt;/code&gt; or &lt;code&gt;org.jcc.ß\u03c06&lt;/code&gt;).&lt;br&gt;
+   * It constrains that there is a line starting with the word &lt;code&gt;package&lt;/code&gt; but it does not
+   * ensure that it is not inside a block comment like:
+   *
+   * &lt;pre&gt;
+   * &amp;#47;&amp;#42;
+   *  * package a.b.c;
+   * &amp;#42;&amp;#47;
+   * package d.e.f;
+   * &lt;/pre&gt;
+   */
+  private static final String packageDeclaration = &quot;^package\\s+([^\\.;]+(\\.[^\\.;]+)*)\\s*;&quot;;
+  
+  /**
+   * The regex to find the parser name.&lt;br&gt;
+   * It constrains that there is a line starting with the word &lt;code&gt;PARSER_BEGIN&lt;/code&gt; but it does
+   * not ensure that it is not inside a block comment like:
+   *
+   * &lt;pre&gt;
+   * &amp;#47;&amp;#42;
+   *  * PARSER_BEGIN(p);
+   * &amp;#42;&amp;#47;
+   * PARSER_BEGIN(q);
+   * &lt;/pre&gt;
+   */
+  private static final String parserBegin = &quot;^PARSER_BEGIN\\s*\\(\\s*([^\\s\\)]+)\\s*\\)&quot;;
+  
+  /** JavaCC file extension. */
+  public static final String JJ_EXT = &quot;.jj&quot;;
+  
+  /**
+   * Creates a new info from the specified grammar file.
+   *
+   * @param lg - the logger
+   * @param lang - the language to generate the parser for
+   * @param enc - the grammar file encoding
+   * @param sourceDir - the absolute path (not checked) to the base directory in which the grammar
+   *          file resides, must not be &lt;code&gt;null&lt;/code&gt;
+   * @param inputFile - the path to the grammar file (relative to the source directory - not
+   *          checked), must not be &lt;code&gt;null&lt;/code&gt;
+   * @throws GrammarException if reading the grammar file failed, or if no parser name can be
+   *           retrieved in the grammar
+   */
+  public GrammarInfo(final Log lg, final Language lang, final String enc, final File sourceDir,
+<span class="fc" id="L129">      final String inputFile) throws GrammarException {</span>
+    
+<span class="fc" id="L131">    log = lg;</span>
+<span class="fc" id="L132">    sourceDirectory = sourceDir;</span>
+<span class="fc" id="L133">    final File inFile = new File(inputFile);</span>
+<span class="fc" id="L134">    grammarFile = inFile.getPath();</span>
+    String grammar;
+    try {
+<span class="fc" id="L137">      grammar = FileUtils.fileRead(getAbsoluteGrammarFile(), enc);</span>
+    }
+<span class="fc" id="L139">    catch (final IOException e) {</span>
+<span class="fc" id="L140">      throw new GrammarException(</span>
+<span class="fc" id="L141">          &quot;Error reading input file '&quot; + inputFile + &quot;' / '&quot; + getAbsoluteGrammarFile() + &quot;'&quot;, e);</span>
+<span class="fc" id="L142">    }</span>
+    
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (lang == null) {</span>
+<span class="fc" id="L145">      log.debug(&quot;no language set, probably for a reporting goal&quot;);</span>
+<span class="fc" id="L146">      return;</span>
+    }
+    
+    // TODO find a better way to isolate language dependent code
+<span class="fc bfc" id="L150" title="All 2 branches covered.">    if (lang.usesPackage) {</span>
+<span class="fc" id="L151">      parserPackage = findPackageName(grammar);</span>
+<span class="fc" id="L152">      parserSubDirectory = parserPackage.replace('.', File.separatorChar);</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">      if (parserSubDirectory.length() &gt; 0) {</span>
+<span class="fc" id="L154">        parserSubDirectory += File.separator;</span>
+      }
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    } else if (lang.usesPath) {</span>
+<span class="fc" id="L157">      parserPackage = &quot;&quot;;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">      parserSubDirectory = inFile.getParent() == null ? &quot;&quot; : inFile.getParent() + File.separator;</span>
+    } else {
+      // note-jacoco: need to wait for an ad-hoc language to set a test case for here
+<span class="nc" id="L161">      parserPackage = &quot;&quot;;</span>
+<span class="nc" id="L162">      parserSubDirectory = &quot;&quot;;</span>
+    }
+<span class="fc" id="L164">    log.debug(&quot;parserPackage = '&quot; + parserPackage + &quot;', parserSubDirectory = '&quot; + parserSubDirectory</span>
+        + &quot;'&quot;);
+    
+<span class="fc" id="L167">    parserName = findParserName(grammar);</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (parserName.length() &lt;= 0) {</span>
+<span class="fc" id="L169">      throw new GrammarException(</span>
+          &quot;No parser name found in PARSER_BEGIN(...) statement for grammar '&quot; + inputFile + &quot;'&quot;);
+    }
+<span class="fc" id="L172">    log.debug(&quot;parserName = '&quot; + parserName + &quot;'&quot;);</span>
+    
+<span class="fc bfc" id="L174" title="All 2 branches covered.">    if (grammarFile.endsWith(JJ_EXT)) {</span>
+<span class="fc" id="L175">      mainGeneratedFile = parserSubDirectory + parserName + lang.extension;</span>
+    } else {
+<span class="fc" id="L177">      mainGeneratedFile = grammarFile.substring(0, grammarFile.length() - 4) + JJ_EXT;</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">      if (!grammarFile.startsWith(parserSubDirectory)) {</span>
+<span class="fc" id="L179">        mainGeneratedFile = parserSubDirectory + mainGeneratedFile;</span>
+      }
+    }
+    
+<span class="fc" id="L183">    log.debug(&quot;mainGeneratedFile = '&quot; + mainGeneratedFile + &quot;'&quot;);</span>
+<span class="fc" id="L184">  }</span>
+  
+  /** The compiled regex pattern to find an escaped unicode character. */
+<span class="fc" id="L187">  static final Pattern pattUni = Pattern.compile(&quot;\\\\u[0-9a-fA-F]{4}&quot;);</span>
+  
+  /**
+   * Converts an input string with escaped unicode characters in a string without escaped unicode
+   * characters.
+   *
+   * @param input - an input string
+   * @return the original string or a new string, always without escaped unicode characters
+   */
+  public static String removeEscapedUnicodeCharacters(final String input) {
+<span class="fc" id="L197">    final Matcher matcher = pattUni.matcher(input);</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">    if (!matcher.find()) {</span>
+<span class="fc" id="L199">      return input;</span>
+    }
+<span class="fc" id="L201">    final StringBuffer uncodedString = new StringBuffer(input.length());</span>
+    do {
+<span class="fc" id="L203">      final String unicodeSequence = matcher.group();</span>
+<span class="fc" id="L204">      final char unicodeChar = (char) Integer.parseInt(unicodeSequence.substring(2), 16);</span>
+<span class="fc" id="L205">      matcher.appendReplacement(uncodedString, Character.toString(unicodeChar));</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">    } while (matcher.find());</span>
+<span class="fc" id="L207">    matcher.appendTail(uncodedString);</span>
+<span class="fc" id="L208">    return uncodedString.toString();</span>
+  }
+  
+  /**
+   * Creates a new GrammarInfo from the current one changing its grammar file to the corresponding
+   * &lt;code&gt;.jj&lt;/code&gt; one and its source directory to a given one.
+   *
+   * @param sourceDir - the source directory
+   * @return - the new GramarInfo
+   */
+  public GrammarInfo deriveJJ(final File sourceDir) {
+<span class="fc" id="L219">    String jjFile = grammarFile.replace(parserSubDirectory, &quot;&quot;);</span>
+<span class="fc" id="L220">    jjFile = jjFile.substring(0, jjFile.lastIndexOf('.')) + JJ_EXT;</span>
+<span class="fc" id="L221">    log.debug(&quot;grammarFile = '&quot; + grammarFile + &quot;', sourceDir = '&quot; + sourceDir</span>
+        + &quot;', parserSubDirectory = '&quot; + parserSubDirectory + &quot;', jjFile = '&quot; + jjFile + &quot;'&quot;);
+<span class="fc" id="L223">    return new GrammarInfo(this, sourceDir, jjFile);</span>
+  }
+  
+  /**
+   * Constructor for cloning an instance and change some fields.
+   *
+   * @param gi - the instance to clone
+   * @param sourceDir - the new source directory field
+   * @param gramFile - the new grammar file field
+   */
+<span class="fc" id="L233">  private GrammarInfo(final GrammarInfo gi, final File sourceDir, final String gramFile) {</span>
+<span class="fc" id="L234">    log = gi.log;</span>
+<span class="fc" id="L235">    sourceDirectory = sourceDir;</span>
+<span class="fc" id="L236">    grammarFile = gi.parserSubDirectory + gramFile;</span>
+<span class="fc" id="L237">    parserPackage = gi.parserPackage;</span>
+<span class="fc" id="L238">    parserSubDirectory = gi.parserSubDirectory;</span>
+<span class="fc" id="L239">    parserName = gi.parserName;</span>
+<span class="fc" id="L240">    mainGeneratedFile = gi.mainGeneratedFile;</span>
+<span class="fc" id="L241">  }</span>
+  
+  /**
+   * Extracts the declared package name from the specified grammar file.
+   *
+   * @param grammar - the contents of the grammar file, must not be &lt;code&gt;null&lt;/code&gt;
+   * @return the declared package name or an empty string if not found
+   */
+  private String findPackageName(final String grammar) {
+<span class="fc" id="L250">    final Matcher matcher = Pattern.compile(packageDeclaration, Pattern.MULTILINE).matcher(grammar);</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">    return matcher.find() ? removeEscapedUnicodeCharacters(matcher.group(1)) : &quot;&quot;;</span>
+  }
+  
+  /**
+   * Extracts the simple parser name from the specified grammar file.
+   *
+   * @param grammar - the contents of the grammar file, must not be &lt;code&gt;null&lt;/code&gt;
+   * @return The parser name or an empty string if not found
+   */
+  private String findParserName(final String grammar) {
+<span class="fc" id="L261">    final Matcher matcher = Pattern.compile(parserBegin, Pattern.MULTILINE).matcher(grammar);</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">    return matcher.find() ? removeEscapedUnicodeCharacters(matcher.group(1)) : &quot;&quot;;</span>
+  }
+  
+  /**
+   * Gets the absolute path to the base directory in which the grammar file resides.&lt;br&gt;
+   * Note that this is not necessarily the parent directory of the grammar file.
+   *
+   * @return the absolute path to the base directory in which the grammar file resides, never &lt;code&gt;
+   *     null&lt;/code&gt;
+   */
+  public File getSourceDirectory() {
+<span class="fc" id="L273">    return sourceDirectory;</span>
+  }
+  
+  /**
+   * Gets the path to the grammar file (relative to its source directory).
+   *
+   * @return the path to the grammar file (relative to its source directory), never &lt;code&gt;null
+   *     &lt;/code&gt;
+   */
+  public String getGrammarFile() {
+<span class="nc" id="L283">    return grammarFile;</span>
+  }
+  
+  /**
+   * Gets the absolute path to the grammar file.
+   *
+   * @return the absolute path to the grammar file, never &lt;code&gt;null&lt;/code&gt;
+   */
+  public File getAbsoluteGrammarFile() {
+<span class="fc" id="L292">    return new File(sourceDirectory, grammarFile);</span>
+  }
+  
+  /**
+   * Gets the declared package for the generated parser (e.g. &lt;code&gt;org.javacc.mypkg&lt;/code&gt;).
+   *
+   * @return the declared package for the generated parser or an empty string if no package
+   *         declaration was found, never &lt;code&gt;null&lt;/code&gt;
+   */
+  public String getParserPackage() {
+<span class="nc" id="L302">    return parserPackage;</span>
+  }
+  
+  /**
+   * Gets the path to the sub directory of the generated parser (relative to an output directory
+   * that will be registered as a source root directory, e.g. &lt;code&gt;org/javacc/mypkg&lt;/code&gt;),
+   * terminated by the file separator, or the empty string.
+   *
+   * @return the path to the sub directory of the generated parser or an empty string, never &lt;code&gt;
+   *     null&lt;/code&gt;
+   */
+  public String getParserSubDirectory() {
+<span class="fc" id="L314">    return parserSubDirectory;</span>
+  }
+  
+  /**
+   * Gets the simple name of the generated parser (e.g. &lt;code&gt;MyParser&lt;/code&gt;)
+   *
+   * @return the simple name of the generated parser, never &lt;code&gt;null&lt;/code&gt;
+   */
+  public String getParserName() {
+<span class="nc" id="L323">    return parserName;</span>
+  }
+  
+  /**
+   * Gets the name of the main generated file.
+   *
+   * @return the name of the main generated file, can be &lt;code&gt;null&lt;/code&gt;
+   */
+  public String getMainGeneratedFile() {
+<span class="fc" id="L332">    return mainGeneratedFile;</span>
+  }
+  
+  /**
+   * Sets the name of the main generated file.
+   *
+   * @param name - the name of the main generated file, never &lt;code&gt;null&lt;/code&gt;
+   */
+  public void setMainGeneratedFile(final String name) {
+<span class="fc" id="L341">    mainGeneratedFile = name;</span>
+<span class="fc" id="L342">  }</span>
+  
+  /**
+   * Gets a string representation of this bean (for debugging).
+   *
+   * @return a string representation of this bean
+   */
+  @Override
+  public String toString() {
+<span class="fc" id="L351">    return getAbsoluteGrammarFile() + &quot; -&gt; &quot; + getMainGeneratedFile();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

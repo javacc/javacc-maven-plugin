@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JJDocGoalMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">JJDocGoalMojo.java</span></div><h1>JJDocGoalMojo.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
+/**
+ * The &lt;b&gt;jjdoc&lt;/b&gt; goal, for producing documentation for a JavaCC / JJTree / JTB grammar.&lt;br&gt;
+ * It is used indirectly under the hood when using the plugin as a reporting plugin, triggered by
+ * the Maven site plugin, producing JJDoc reports. In that case there can be only one execution and
+ * one configuration defining the source directories and other parameters.&lt;br&gt;
+ * It can also be used directly as a standalone goal, as a build plugin, if one wants more control,
+ * for example for multiple executions with different configurations with different sets of source
+ * directories and other parameters.&lt;br&gt;
+ * It searches the source directories for all grammar files (those included and not excluded) and
+ * runs JJDoc once for each file it finds, producing output files of the format set through the
+ * JJDoc options, and of names set through JJDoc options &lt;code&gt;OUTPUT_DIRECTORY&lt;/code&gt; and
+ * &lt;code&gt;OUTPUT_FILE&lt;/code&gt;.&lt;br&gt;
+ * It also produces, for each execution, an HTML &quot;index&quot; file named through the plugin parameter
+ * &lt;code&gt;jjdocReportsPage&lt;/code&gt; containing a table with the hyperlinks for the grammar file name to
+ * its corresponding generated JJDoc document, in a directory set by a plugin parameter
+ * &lt;code&gt;jjdocReportsDirectory&lt;/code&gt; if used in a build plugin or by the Maven site plugin
+ * parameter &lt;code&gt;outputDirectory&lt;/code&gt; if used in a reporting plugin.&lt;br&gt;
+ * And finally, if used in a reporting plugin, the Maven site plugin will create a menu entry to the
+ * HTML &quot;index&quot; page in the &quot;Project Documentation / Project Reports&quot; menu of the site.
+ * &lt;p&gt;
+ * Detailed information about the JJDoc options can be found on the
+ * &lt;a href=&quot;https://javacc.github.io/javacc/documentation/jjdoc.html&quot;&gt;JJDoc documentation
+ * page&lt;/a&gt;.&lt;br&gt;
+ * Examples can be found in the integration tests &lt;a href=
+ * &quot;https://github.com/javacc/javacc-maven-plugin/tree/master/src/it/jjdoc-goal&quot;&gt;jjdoc-goal&lt;/a&gt; and
+ * &lt;a href=
+ * &quot;https://github.com/javacc/javacc-maven-plugin/tree/master/src/it/site-phase&quot;&gt;site-phase&lt;/a&gt;.&lt;br&gt;
+ * The code repositories can be found within &lt;a href=&quot;https://github.com/javacc&quot;&gt;JavaCC at
+ * GitHub&lt;/a&gt; and &lt;a href=&quot;https://github.com/jtb-javacc&quot;&gt;JTB at GitHub&lt;/a&gt;.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ */
+@Mojo(name = &quot;jjdoc&quot;, defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
+<span class="fc" id="L77">public class JJDocGoalMojo extends AbstractPluginReport {</span>
+  
+  /** The bean handling JJDoc options as command line arguments. */
+<span class="fc" id="L80">  private final JJDocArgumentsBean jjdab = new JJDocArgumentsBean();</span>
+  
+  /**
+   * The list of single full command line arguments, which should be in the form accepted by JJDoc.
+   *
+   * &lt;p&gt;
+   * No arguments are read and used by the plugin.
+   *
+   * &lt;p&gt;
+   * The list will be passed as it is to JJDoc, no control nor modification is done by the
+   * plugin.&lt;br&gt;
+   * Note that JJDoc can internally pass some options to the parser it calls.
+   *
+   * &lt;p&gt;
+   * The list has no default value.
+   *
+   * &lt;p&gt;
+   * Example:&lt;br&gt;
+   *
+   * &lt;pre&gt;{@code
+   * &lt;jjdocCmdLineArgs&gt;
+   *   &lt;arg&gt;-CODE_GENERATOR=&quot;C#&quot;&lt;/arg&gt;
+   *   &lt;arg&gt;-BNF=true&lt;/arg&gt;
+   *   &lt;arg&gt;-CSS=&quot;src/main/resources/my_css&quot;&lt;/arg&gt;
+   * &lt;/jjdocCmdLineArgs&gt;
+   * }&lt;/pre&gt;
+   *
+   * &lt;br&gt;
+   * Note that the &lt;code&gt;javaccCmdLineArgs&lt;/code&gt; parameter is of type {@code List&lt;String&gt;}, which
+   * implies that the inner tags names can have any names and may be appear many times (like
+   * &lt;code&gt;arg&lt;/code&gt; above).&lt;br&gt;
+   * Note also that if the project has a parent which also configures the plugin with parameters (to
+   * factorize them for the children for example), the child parameters will complement / replace
+   * the parent's ones for those that are absent / present in the parent; so
+   * &lt;ul&gt;
+   * &lt;li&gt;if one wants to get rid of (all) the parent's ones, he must use the &lt;code&gt;
+   * combine.self=&quot;override&quot;&lt;/code&gt; attribute at the list level in the child, and&lt;/li&gt;
+   * &lt;li&gt;if one wants to replace some of the parent's ones and add new ones in the child it is
+   * recommended to use distinct tag names in the parent, the same tag names in the child for those
+   * that must be replaced and another tag name or other tag names for the new ones.&lt;/li&gt;
+   * &lt;/ul&gt;
+   * See also &lt;a href=
+   * &quot;https://github.com/javacc/javacc-maven-plugin/readme.md#processor_parameters&quot;&gt;Processor
+   * parameters&lt;/a&gt;.
+   */
+  @Parameter(property = &quot;javacc.jjdocCmdLineArgs&quot;) //
+  protected List&lt;String&gt; jjdocCmdLineArgs;
+  
+  /**
+   * The output directory where Maven / Doxia generates the HTML files summarizing the JJDoc reports
+   * generation.&lt;br&gt;
+   * Note that this parameter is only relevant if the goal is run from the command line or from the
+   * default build lifecycle.&lt;br&gt;
+   * If the goal is run indirectly as part of a site generation, the output directory configured in
+   * the Maven Site Plugin is used instead (it will usually be &quot;${project.build.directory}/site&quot;).
+   * &lt;p&gt;
+   * Note that this is not the directory where JJDoc itself generates its reports, which must be set
+   * by the JJDoc OUTPUT_DIRECTORY option.
+   *
+   */
+  @Parameter(property = &quot;javacc.jjdocReportsDirectory&quot;, defaultValue = &quot;${project.build.directory}/generated-jjdoc&quot;) //
+  private File jjdocReportsDirectory;
+  
+  /**
+   * The HTML page name (with extension), relative to the output directory, where Maven / Doxia
+   * generates the table of the JJDoc reports for the current execution.&lt;br&gt;
+   * Use a non default value for each of multiple executions, to differentiate reports.
+   */
+  @Parameter(property = &quot;javacc.jjdocReportsPage&quot;, defaultValue = &quot;/jjdoc-reports.html&quot;) //
+  protected String jjdocReportsPage;
+  
+  @Override
+  protected void initProcessor() throws PluginException {
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    if (includes == null) {</span>
+<span class="fc" id="L154">      includes = new String[] {</span>
+          &quot;**/*.jj&quot;, &quot;**/*.jjt&quot;, &quot;**/*.jtb&quot;
+      };
+<span class="fc" id="L157">      getLog().debug(&quot;no custom includes, so initialized to '&quot; + Arrays.toString(includes) + &quot;'&quot;);</span>
+    } else {
+<span class="fc" id="L159">      getLog().debug(&quot;custom includes is '&quot; + Arrays.toString(includes) + &quot;'&quot;);</span>
+    }
+<span class="fc" id="L161">    boolean custom = true;</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">    if (sourceDirectories == null) {</span>
+<span class="nc" id="L163">      custom = false;</span>
+<span class="nc" id="L164">      sourceDirectories = new ArrayList&lt;&gt;();</span>
+    }
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    if (sourceDirectories.isEmpty()) {</span>
+<span class="fc" id="L167">      final File jjdir = new File(project.getBasedir(), JavaCCArgumentsBean.defSrcSubDir);</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">      if (jjdir.exists()) {</span>
+<span class="fc" id="L169">        sourceDirectories.add(jjdir);</span>
+      }
+<span class="fc" id="L171">      final File jjtdir = new File(project.getBasedir(), JJTreeArgumentsBean.defSrcSubDir);</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">      if (jjtdir.exists()) {</span>
+<span class="fc" id="L173">        sourceDirectories.add(jjtdir);</span>
+      }
+<span class="fc" id="L175">      final File jtbdir = new File(project.getBasedir(), JTBArgumentsBean.defSrcSubDir);</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">      if (jtbdir.exists()) {</span>
+<span class="fc" id="L177">        sourceDirectories.add(jtbdir);</span>
+      }
+    }
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">    if (custom) {</span>
+<span class="fc" id="L181">      getLog().debug(&quot;custom sourceDirectories is '&quot; + displayDirectories(sourceDirectories) + &quot;'&quot;);</span>
+    } else {
+<span class="nc" id="L183">      getLog().debug(&quot;no custom sourceDirectories, so initialized to '&quot;</span>
+<span class="nc" id="L184">          + displayDirectories(sourceDirectories) + &quot;'&quot;);</span>
+    }
+<span class="fc" id="L186">    getLog().debug(&quot;jjdocReportsPage is '&quot; + jjdocReportsPage + &quot;'&quot;);</span>
+<span class="fc" id="L187">    getLog().debug(&quot;jjdocReportsDirectory is '&quot; + jjdocReportsDirectory + &quot;'&quot;);</span>
+    
+    // mojo's log injected after the mojo is constructed, so wait until now to pass it to the bean
+<span class="fc" id="L190">    jjdab.log = getLog();</span>
+<span class="fc" id="L191">    jjdab.setProcCmdLineArgs(jjdocCmdLineArgs);</span>
+<span class="fc" id="L192">    jjdab.findSpecificOptions(project, &quot;jjdocCmdLineArgs&quot;);</span>
+<span class="fc" id="L193">  }</span>
+  
+  @Override
+  protected void processGrammar(final GrammarInfo grammarInfo) throws ProcessorException {
+<span class="fc" id="L197">    getLog().debug(&quot;processGrammar '&quot; + grammarInfo.getAbsoluteGrammarFile() + &quot;'&quot;);</span>
+<span class="fc" id="L198">    final JJDocProcessor jjp = new JJDocProcessor(getLog());</span>
+<span class="fc" id="L199">    jjp.inputFile = grammarInfo.getAbsoluteGrammarFile();</span>
+<span class="fc" id="L200">    jjp.cmdLineArgs = jjdocCmdLineArgs;</span>
+<span class="fc" id="L201">    jjp.run();</span>
+<span class="fc" id="L202">    grammarInfo.setMainGeneratedFile(jjp.outputFileName);</span>
+<span class="fc" id="L203">  }</span>
+  
+  @Override
+  public String getName(final Locale locale) {
+<span class="fc" id="L207">    return getBundle(locale).getString(&quot;report.jjdoc.name&quot;);</span>
+  }
+  
+  @Override
+  protected File[] getProcessorOutputDirectories() {
+<span class="nc" id="L212">    return jjdab.processorOutputDirectories;</span>
+  }
+  
+  @Override
+  public String getDescription(final Locale locale) {
+<span class="fc" id="L217">    return getBundle(locale).getString(&quot;report.jjdoc.short.description&quot;);</span>
+  }
+  
+  @Override
+  protected String getOutputDirectory() {
+<span class="fc" id="L222">    return jjdocReportsDirectory.getAbsolutePath();</span>
+  }
+  
+  @Override
+  public String getOutputPath() {
+<span class="fc" id="L227">    return jjdocReportsPage;</span>
+  }
+  
+  /**
+   * @deprecated Use {@link #getOutputPath()} instead.
+   * @see org.apache.maven.reporting.MavenReport#getOutputName()
+   * @return The name of the main report file.
+   */
+  @Deprecated
+  @Override
+  public String getOutputName() {
+<span class="fc" id="L238">    return getOutputPath();</span>
+  }
+  
+  //  /**
+  //   * The JJDoc output file will have a &lt;code&gt;.html&lt;/code&gt; or &lt;code&gt;.txt&lt;/code&gt; extension depending
+  //   * on the value of the parameters {@link #text} and {@link #bnf}.
+  //   *
+  //   * @return The file extension (including the leading period) to be used for the JJDoc output
+  //   *         files.
+  //   */
+  //  private String getOutputFileExtension() {
+  //    if (Boolean.TRUE.equals(text) || Boolean.TRUE.equals(bnf)) {
+  //      return &quot;.txt&quot;;
+  //    } else {
+  //      return &quot;.html&quot;;
+  //    }
+  //  }
+  
+  @Override
+  protected String getGrammarFileEncoding() {
+<span class="nc bnc" id="L258" title="All 2 branches missed.">    return (jjdab.grammarFileEncodingOptionValue == null)</span>
+        ? AbstractArgumentsBean.defaultGrammarFileEncoding
+        : jjdab.grammarFileEncodingOptionValue;
+  }
+  
+  @Override
+  protected void createReportHeader(final ResourceBundle bundle, final Sink sink) {
+<span class="fc" id="L265">    sink.head();</span>
+<span class="fc" id="L266">    sink.title();</span>
+<span class="fc" id="L267">    sink.text(bundle.getString(&quot;report.jjdoc.title&quot;));</span>
+<span class="fc" id="L268">    sink.title_();</span>
+<span class="fc" id="L269">    sink.head_();</span>
+    
+<span class="fc" id="L271">    sink.body();</span>
+    
+<span class="fc" id="L273">    sink.section1();</span>
+<span class="fc" id="L274">    sink.sectionTitle1();</span>
+<span class="fc" id="L275">    sink.text(bundle.getString(&quot;report.jjdoc.title&quot;));</span>
+<span class="fc" id="L276">    sink.sectionTitle1_();</span>
+<span class="fc" id="L277">    sink.text(bundle.getString(&quot;report.jjdoc.description&quot;));</span>
+<span class="fc" id="L278">    sink.section1_();</span>
+    
+<span class="fc" id="L280">    sink.lineBreak();</span>
+<span class="fc" id="L281">    sink.table();</span>
+<span class="fc" id="L282">    sink.tableRows();</span>
+<span class="fc" id="L283">    sink.tableRow();</span>
+<span class="fc" id="L284">    sink.tableHeaderCell();</span>
+<span class="fc" id="L285">    sink.text(bundle.getString(&quot;report.jjdoc.table.heading&quot;));</span>
+<span class="fc" id="L286">    sink.tableHeaderCell_();</span>
+<span class="fc" id="L287">    sink.tableRow_();</span>
+<span class="fc" id="L288">  }</span>
+  
+  @Override
+  protected void createReportFooter(final Sink sink) {
+<span class="fc" id="L292">    sink.tableRows_();</span>
+<span class="fc" id="L293">    sink.table_();</span>
+<span class="fc" id="L294">    sink.body_();</span>
+<span class="fc" id="L295">  }</span>
+  
+  @Override
+  protected void createReportLink(final Sink sink, final GrammarInfo grammarInfo) {
+<span class="fc" id="L299">    sink.tableRow();</span>
+<span class="fc" id="L300">    sink.tableCell();</span>
+<span class="fc" id="L301">    final String jjdocFile = grammarInfo.getMainGeneratedFile();</span>
+<span class="fc" id="L302">    getLog().debug(&quot;jjdocFile = '&quot; + jjdocFile + &quot;'&quot;);</span>
+<span class="fc" id="L303">    sink.link(new File(jjdocFile).toURI().getPath());</span>
+<span class="fc" id="L304">    final File sourceDirectory = grammarInfo.getSourceDirectory();</span>
+<span class="fc" id="L305">    getLog().debug(&quot;sourceDirectory = '&quot; + sourceDirectory.getName() + &quot;', '&quot;</span>
+<span class="fc" id="L306">        + sourceDirectory.getAbsoluteFile() + &quot;', '&quot;</span>
+<span class="fc" id="L307">        + sourceDirectory.getAbsoluteFile().toURI().toString() + &quot;'&quot;);</span>
+<span class="fc" id="L308">    final File grammarFile = new File(sourceDirectory, grammarInfo.grammarFile);</span>
+<span class="fc" id="L309">    getLog().debug(&quot;grammarFile = '&quot; + grammarFile.getName() + &quot;'&quot;);</span>
+<span class="fc" id="L310">    String grammarFileRelativePath = sourceDirectory.toURI().relativize(grammarFile.toURI())</span>
+<span class="fc" id="L311">        .toString();</span>
+<span class="fc" id="L312">    getLog().debug(&quot;grammarFileRelativePath = '&quot; + grammarFileRelativePath + &quot;'&quot;);</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">    if (grammarFileRelativePath.startsWith(&quot;/&quot;)) {</span>
+<span class="nc" id="L314">      grammarFileRelativePath = grammarFileRelativePath.substring(1);</span>
+    }
+<span class="fc" id="L316">    sink.text(grammarFileRelativePath);</span>
+<span class="fc" id="L317">    sink.link_();</span>
+<span class="fc" id="L318">    sink.tableCell_();</span>
+<span class="fc" id="L319">    sink.tableRow_();</span>
+<span class="fc" id="L320">    getLog().debug(&quot;createReportLink '&quot; + jjdocFile + &quot;', '&quot; + grammarFileRelativePath + &quot;'&quot;);</span>
+<span class="fc" id="L321">  }</span>
+  
+  @Override
+  protected ResourceBundle getBundle(final Locale locale) {
+<span class="fc" id="L325">    return ResourceBundle.getBundle(&quot;jjdoc-report&quot;, locale, getClass().getClassLoader());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

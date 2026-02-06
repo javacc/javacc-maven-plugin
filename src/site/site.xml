@@ -41,7 +41,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
       <item name="${this.name}" href="${this.url}" />
     </breadcrumbs>
     <menu name="Overview">
-      <item name="Introduction" href="intro.html" />
+      <item name="Introduction" href="index.html" />
       <item name="Plugin Documentation" href="plugin-info.html" />
       <item name="Usage" href="usage.html" />
       <item name="Sonatype Hosting" href="https://central.sonatype.com/artifact/org.javacc.plugin/javacc-maven-plugin" />

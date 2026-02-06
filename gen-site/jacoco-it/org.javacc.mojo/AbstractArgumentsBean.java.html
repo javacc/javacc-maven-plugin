@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractArgumentsBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">AbstractArgumentsBean.java</span></div><h1>AbstractArgumentsBean.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+
+/**
+ * Super class of the concrete beans managing common specific processor arguments (options).
+ *
+ * &lt;p&gt;
+ * As some goals run one processor and others run two or more of them, and&lt;br&gt;
+ * as each processor has its own set of options, and&lt;br&gt;
+ * as some processors (preprocessors) use part of other processors (generators) options, and&lt;br&gt;
+ * as the (corresponding) parameters must be managed by the goal mojos,&lt;br&gt;
+ * then&lt;br&gt;
+ * in order to factorize code,&lt;br&gt;
+ * the set of options / parameters are copied to and managed in the concrete beans, and &lt;br&gt;
+ * the goal mojos handle references to one or more of these beans (a common way in Java to handle
+ * multiple inheritance).
+ *
+ * &lt;p&gt;
+ * Most of the processors options are transparent for the plugin, so none are declared as single
+ * parameters as in previous versions of the plugin; since 3.8.0 they are declared as a List of
+ * Strings holding each a full argument (like &lt;code&gt;-OPTION=value&lt;/code&gt;); this for the benefit that
+ * processors options additions or removals should not impact the plugin and therefore not lead to a
+ * new release of the plugin.&lt;br&gt;
+ * A few specific options are read and used by the plugin, in this class or in subclasses.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ * @see AbstractPluginMojo
+ * @see AbstractProcessor
+ */
+<span class="fc" id="L67">abstract class AbstractArgumentsBean {</span>
+  
+  /** The logger. */
+  protected Log log;
+  
+  /**
+   * Abstract getter for the list of single full command line arguments, which should be in the form
+   * accepted by the processor.&lt;br&gt;
+   *
+   * @return the list of single full command line arguments
+   */
+  protected abstract List&lt;String&gt; getProcCmdLineArgs();
+  
+  /**
+   * Abstract setter for the list of single full command line arguments, which should be in the form
+   * accepted by the processor.&lt;br&gt;
+   *
+   * @param argsList - the list of single full command line arguments
+   */
+  protected abstract void setProcCmdLineArgs(List&lt;String&gt; argsList);
+  
+  /** The default grammar file encoding. */
+<span class="fc" id="L89">  protected static final String defaultGrammarFileEncoding = System.getProperty(&quot;file.encoding&quot;);</span>
+  
+  /** The grammar file encoding option value. */
+<span class="fc" id="L92">  protected String grammarFileEncodingOptionValue = null;</span>
+  
+  /** The default output language. */
+<span class="fc" id="L95">  protected static final Language defaultLanguage = Language.JAVA;</span>
+  
+  /** The output language option value. */
+<span class="fc" id="L98">  protected Language languageOptionValue = null;</span>
+  
+  /** The processor output directories (may be more than one). */
+<span class="fc" id="L101">  protected File[] processorOutputDirectories = null;</span>
+  
+  /** The regex to find the code generator option. */
+  protected static final String codeGen = &quot;-[cC][oO][dD][eE]_[gG][eE][nN][eE][rR][aA][tT][oO][rR][=:]\&quot;(.*)\&quot;&quot;;
+  
+  /** The regex to find the grammar encoding option. */
+  protected static final String gramEnc = &quot;-[gG][rR][aA][mM][mM][aA][rR]_[eE][nN][cC][oO][dD][iI][nN][gG][=:]\&quot;(.*)\&quot;&quot;;
+  
+  /**
+   * Retrieve common specific processor options needed by the plugin.
+   *
+   * @param project - the current maven project
+   * @param param - the command line arguments parameter name (for debug display)
+   * @param procOutDirPatterns - the patterns compiled from the regex to find the processor output
+   *          directories options
+   * @param subDir - the sub directories of the project's build directory to form the default
+   *          processor output directories
+   * @throws PluginException if invalid language option value
+   */
+  protected void findSpecificOptions(final MavenProject project, final String param,
+      final Pattern[] procOutDirPatterns, final String[] subDir) throws PluginException {
+    
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    if (procOutDirPatterns == null) {</span>
+<span class="fc" id="L124">      return;</span>
+    }
+    
+<span class="fc" id="L127">    final Pattern codeGenPatt = Pattern.compile(codeGen);</span>
+<span class="fc" id="L128">    final Pattern gramEncPatt = Pattern.compile(gramEnc);</span>
+    
+<span class="fc" id="L130">    processorOutputDirectories = new File[procOutDirPatterns.length];</span>
+    
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (final String arg : getProcCmdLineArgs()) {</span>
+<span class="fc" id="L133">      log.debug(param + &quot; / arg = '&quot; + arg + &quot;'&quot;);</span>
+      Matcher matcher;
+      String opt;
+      
+<span class="fc" id="L137">      matcher = codeGenPatt.matcher(arg);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">      if (matcher.find()) {</span>
+<span class="fc" id="L139">        opt = matcher.group(1);</span>
+<span class="fc" id="L140">        log.debug(&quot;Code generator option is '&quot; + opt + &quot;', -&gt; language&quot;);</span>
+<span class="fc" id="L141">        languageOptionValue = Language.getLanguageFrom(opt);</span>
+      }
+      
+<span class="fc" id="L144">      matcher = gramEncPatt.matcher(arg);</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">      if (matcher.find()) {</span>
+<span class="fc" id="L146">        opt = matcher.group(1);</span>
+<span class="fc" id="L147">        log.debug(&quot;Grammar file encoding option is '&quot; + opt + &quot;', -&gt; grammarFileEncoding&quot;);</span>
+<span class="fc" id="L148">        grammarFileEncodingOptionValue = opt;</span>
+      }
+      
+<span class="fc bfc" id="L151" title="All 2 branches covered.">      for (int i = 0; i &lt; procOutDirPatterns.length; i++) {</span>
+<span class="fc" id="L152">        matcher = procOutDirPatterns[i].matcher(arg);</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (matcher.find()) {</span>
+<span class="fc" id="L154">          opt = matcher.group(1);</span>
+<span class="fc" id="L155">          log.debug(</span>
+              &quot;Output directory option is '&quot; + opt + &quot;', -&gt; processorOutputDirectories[&quot; + i + &quot;]&quot;);
+<span class="fc" id="L157">          processorOutputDirectories[i] = new File(opt);</span>
+        }
+      } // end for outDirPatt 1
+<span class="fc" id="L160">    } // end for getProcCmdLineArgs</span>
+    
+<span class="fc bfc" id="L162" title="All 2 branches covered.">    for (int i = 0; i &lt; procOutDirPatterns.length; i++) {</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">      if (processorOutputDirectories[i] == null) {</span>
+        // if no option set, the plugin will copy the generated files to the build (sub)directory
+<span class="fc" id="L165">        processorOutputDirectories[i] = new File(project.getBuild().getDirectory(), subDir[i]);</span>
+<span class="fc" id="L166">        log.debug(&quot;No output directory option set, defaulting to '&quot;</span>
+<span class="fc" id="L167">            + processorOutputDirectories[i].getPath() + &quot;', -&gt; processorOutputDirectories[&quot; + i</span>
+            + &quot;]&quot;);
+      }
+      // if processorOutputDirectory does not exist, it will be created by the processor
+<span class="pc bpc" id="L171" title="1 of 4 branches missed.">      if (processorOutputDirectories[i].exists() &amp;&amp; !processorOutputDirectories[i].isDirectory()) {</span>
+<span class="nc" id="L172">        throw new PluginException(</span>
+            &quot;Output directory '&quot; + processorOutputDirectories[i] + &quot;' is an existing file&quot;);
+      }
+      
+      try {
+<span class="fc" id="L177">        final String podcp = processorOutputDirectories[i].getCanonicalPath();</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (!podcp.equals(processorOutputDirectories[i].getPath())) {</span>
+<span class="fc" id="L179">          log.debug(</span>
+              &quot;Output directory &quot; + i + &quot; transformed to its canonical pathname '&quot; + podcp + &quot;'&quot;);
+<span class="fc" id="L181">          processorOutputDirectories[i] = new File(podcp);</span>
+        }
+      }
+<span class="fc" id="L184">      catch (final IOException e) {</span>
+<span class="fc" id="L185">        throw new PluginException(&quot;Output directory '&quot; + processorOutputDirectories[i]</span>
+<span class="fc" id="L186">            + &quot;' looks invalid: '&quot; + e.getMessage() + &quot;'&quot;);</span>
+<span class="fc" id="L187">      }</span>
+    } // end for outDirPatt 2
+<span class="fc" id="L189">  }</span>
+  
+  /**
+   * Retrieve some specific processor options needed by the plugin.
+   *
+   * @param project - the current maven project
+   * @param param - the command line arguments parameter name (for debug display)
+   * @throws PluginException if invalid option value
+   */
+  protected abstract void findSpecificOptions(final MavenProject project, final String param)
+      throws PluginException;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

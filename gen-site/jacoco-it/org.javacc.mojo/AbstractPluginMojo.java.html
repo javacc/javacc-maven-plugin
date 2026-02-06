@@ -1,0 +1,831 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractPluginMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">AbstractPluginMojo.java</span></div><h1>AbstractPluginMojo.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.FileUtils;
+
+/**
+ * Super class, managing common plugin-level parameters and methods, of the concrete mojos that
+ * generate parser and tree code files from the grammar files.
+ *
+ * &lt;p&gt;
+ * Each subclass manages a goal that
+ *
+ * &lt;ul&gt;
+ * &lt;li&gt;manages the corresponding processor(s) command line arguments (options) as maven parameters,
+ * with the help of corresponding beans, and
+ * &lt;li&gt;triggers execution of one or more processors
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;
+ * One can set a specific log level for all classes of this plugin (without setting the global
+ * &lt;code&gt;-X&lt;/code&gt; argument) through the (standard maven SLF4J Simple configuration) property&lt;br&gt;
+ * &lt;code&gt;-Dorg.slf4j.simpleLogger.log.org.javacc.mojo=debug&lt;/code&gt;.&lt;br&gt;
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ * @see AbstractProcessor
+ * @see AbstractArgumentsBean
+ * @see AbstractPluginReport
+ */
+<span class="fc" id="L68">public abstract class AbstractPluginMojo extends AbstractMojo {</span>
+  
+  /** The current Maven project. */
+  @Parameter(defaultValue = &quot;${project}&quot;, readonly = true, required = true) //
+  protected MavenProject project;
+  
+  /**
+   * The set of Ant-like exclusion patterns used to prevent certain files from being processed.&lt;br&gt;
+   * By default, this set is empty such that no files are excluded.
+   */
+  @Parameter //
+  protected String[] excludes;
+  
+  /**
+   * The fail on plugin error flag.&lt;br&gt;
+   * It governs how the plugin will handle the errors it encountered on general configuration (i.e.
+   * parameters not related to grammars).&lt;br&gt;
+   * Possible values are &lt;code&gt;true&lt;/code&gt; and &lt;code&gt;false&lt;/code&gt;.&lt;br&gt;
+   * On the first error: if set to &lt;code&gt;false&lt;/code&gt;, the error message is displayed but the plugin
+   * will not report an error for the current execution (i.e. it will continue with the next
+   * execution);&lt;br&gt;
+   * if set to &lt;code&gt;true&lt;/code&gt; the error message is displayed and the plugin will report an error
+   * for the build.
+   */
+  @Parameter(property = &quot;javacc.failOnPluginError&quot;, defaultValue = &quot;true&quot;) //
+  protected Boolean failOnPluginError;
+  
+  /**
+   * The fail on grammar error parameter.&lt;br&gt;
+   * It governs how the plugin will handle the errors it encountered while trying to read a grammar
+   * file to retrieve the parser name (and the parser package for languages that use it) (in an
+   * execution the plugin may process zero, one or many grammars).&lt;br&gt;
+   * Possible values are &lt;code&gt;first&lt;/code&gt;, &lt;code&gt;last&lt;/code&gt; and &lt;code&gt;ignore&lt;/code&gt;.&lt;br&gt;
+   * If set to &lt;code&gt;first&lt;/code&gt;, the error message is displayed, the plugin will stop processing
+   * other grammars and will report an error for the build;&lt;br&gt;
+   * if set to &lt;code&gt;last&lt;/code&gt;, the error message is displayed, the plugin will continue
+   * processing other grammars and at the end it will report an error for the build;&lt;br&gt;
+   * if set to &lt;code&gt;ignore&lt;/code&gt; the error message(s) is(are) displayed but the plugin will not
+   * report an error for the current execution (i.e. it will continue with the next execution).
+   */
+  @Parameter(property = &quot;javacc.failOnGrammarError&quot;, defaultValue = &quot;first&quot;) //
+  protected String failOnGrammarError;
+  
+  /**
+   * The fail on processor error parameter.&lt;br&gt;
+   * It governs how the plugin will handle the errors returned by the processor invocations and the
+   * plugin post-processor copy operations (in an execution the plugin may process zero, one or many
+   * grammars and invoke one or more processors for each).&lt;br&gt;
+   * Possible values are &lt;code&gt;first&lt;/code&gt;, &lt;code&gt;last&lt;/code&gt; and &lt;code&gt;ignore&lt;/code&gt;.&lt;br&gt;
+   * If set to &lt;code&gt;first&lt;/code&gt;, the error message is displayed, the plugin will stop processing
+   * other grammars and will report an error for the build;&lt;br&gt;
+   * if set to &lt;code&gt;last&lt;/code&gt;, the error message is displayed, the plugin will continue
+   * processing other grammars and at the end it will report an error for the build;&lt;br&gt;
+   * if set to &lt;code&gt;ignore&lt;/code&gt; the error message(s) is(are) displayed but the plugin will not
+   * report an error for the current execution (i.e. it will continue with the next execution).
+   */
+  @Parameter(property = &quot;javacc.failOnProcessorError&quot;, defaultValue = &quot;first&quot;) //
+  protected String failOnProcessorError;
+  
+  /**
+   * The set of Ant-like inclusion patterns used to select files from the source directory for
+   * processing.&lt;br&gt;
+   * By default, the patterns are:&lt;br&gt;
+   * &lt;code&gt;**&amp;#47;*.jj&lt;/code&gt; for the &lt;code&gt;javacc&lt;/code&gt; goal,&lt;br&gt;
+   * &lt;code&gt;**&amp;#47;*.jjt&lt;/code&gt; for the &lt;code&gt;jjtree&lt;/code&gt; and &lt;code&gt;jjtree-javacc&lt;/code&gt; goals,&lt;br&gt;
+   * &lt;code&gt;**&amp;#47;*.jtb&lt;/code&gt; for the &lt;code&gt;jtb&lt;/code&gt; and &lt;code&gt;jtb-javacc&lt;/code&gt; goals.
+   */
+<span class="fc" id="L135">  @Parameter //</span>
+  protected String[] includes = null;
+  
+  /**
+   * The keep the intermediate directory(ies) flag.&lt;br&gt;
+   * If set to true, the intermediate directory(ies) will not be deleted, which may sometimes be
+   * handy for plugin or processor debug purposes.
+   */
+  @Parameter(property = &quot;javacc.keepIntermediateDirectory&quot;, defaultValue = &quot;false&quot;) //
+  protected Boolean keepIntermediateDirectory;
+  
+  /**
+   * The skip processing flag.&lt;br&gt;
+   * If true, no goal will not be executed.
+   */
+  @Parameter(property = &quot;javacc.skip&quot;, defaultValue = &quot;false&quot;) //
+  protected Boolean skip;
+  
+  /**
+   * The directory where the grammar files are located.&lt;br&gt;
+   * It must exist and be a directory, otherwise a plugin error will be raised.&lt;br&gt;
+   * This directory will be recursively scanned for input files to pass to JavaCC.&lt;br&gt;
+   * If one wants a pom to process more than one source directory, he must configure multiple
+   * executions with different source directories.&lt;br&gt;
+   * Note: we could have implemented a list of source directories (as in
+   * {@link AbstractPluginReport}, but most of the time different source directories will need
+   * different configurations, so the user would still have to configure multiple executions.&lt;br&gt;
+   * The parameters &lt;code&gt;includes&lt;/code&gt; and &lt;code&gt;excludes&lt;/code&gt; can be used to select a subset
+   * of the files.&lt;br&gt;
+   * If not an absolute path, maven internals considers it is relative to &lt;code&gt;${basedir}&lt;/code&gt;
+   * and converts it accordingly to an absolute path (i.e. &lt;code&gt;src/main/javacc&lt;/code&gt; will be
+   * considered as &lt;code&gt;${basedir}/src/main/javacc&lt;/code&gt;, but &lt;code&gt;/src/main/javacc&lt;/code&gt; will
+   * be considered as an absolute path, usually leading to an error.&lt;br&gt;
+   * The default value, adequate for a user written grammar, but not for a generated (by a
+   * preprocessor) grammar, is:&lt;br&gt;
+   * &lt;code&gt;${basedir}/src/main/javacc&lt;/code&gt; for JavaCC,&lt;br&gt;
+   * &lt;code&gt;${basedir}/src/main/jjtree&lt;/code&gt; for JJTree,&lt;br&gt;
+   * &lt;code&gt;${basedir}/src/main/jtb&lt;/code&gt; for JTB.
+   */
+<span class="fc" id="L174">  @Parameter(property = &quot;javacc.sourceDirectory&quot;) //</span>
+  protected File sourceDirectory = null;
+  
+  /**
+   * The delta in milliseconds of the last modification timestamps for testing whether a grammar
+   * file needs regeneration.&lt;br&gt;
+   * If set to a negative value, no comparison will be performed and grammars will always be passed
+   * to the processor.&lt;br&gt;
+   * Otherwise a grammar file will be passed to the processor if the sum of the main generated file
+   * timestamp plus this delta is lower than the grammar file timestamp or than the more recent of
+   * the dependent jars timestamps.
+   */
+  @Parameter(property = &quot;javacc.timestampDeltaMs&quot;, defaultValue = &quot;0&quot;) //
+  protected Long timestampDeltaMs;
+  
+  /**
+   * The set of compile source roots whose contents are not generated as part of the goal by the
+   * current processor, i.e. those that usually reside somewhere below &quot;${basedir}/src&quot; in the
+   * project structure.&lt;br&gt;
+   * Files in these source roots are owned by the user and must not be overwritten with generated
+   * files.
+   */
+  protected List&lt;File&gt; nonGeneratedCompileSourceRoots;
+  
+  /**
+   * Abstract getter.
+   *
+   * @return the grammar file encoding option value, or the default encoding if no option, never
+   *         &lt;code&gt;null&lt;/code&gt;
+   */
+  protected abstract String getGrammarFileEncoding();
+  
+  /**
+   * Abstract getter.
+   *
+   * @return The output language option value, or the default language if no option, never &lt;code&gt;
+   *     null&lt;/code&gt;
+   */
+  protected abstract Language getLanguage();
+  
+  @Override
+  public void execute() throws MojoExecutionException {
+    
+<span class="fc bfc" id="L217" title="All 2 branches covered.">    if (skip) {</span>
+<span class="fc" id="L218">      getLog().info(&quot;Skipping processing as requested&quot;);</span>
+<span class="fc" id="L219">      return;</span>
+    }
+    
+    try {
+<span class="fc" id="L223">      checkOptions();</span>
+<span class="fc" id="L224">      initProcessor();</span>
+    }
+<span class="fc" id="L226">    catch (final PluginException e) {</span>
+      // failOnPluginError == 'true' will throw a MojoExecutionException
+<span class="fc" id="L228">      handlePluginException(e);</span>
+      // failOnPluginError == 'false'
+<span class="fc" id="L230">      return;</span>
+<span class="fc" id="L231">    }</span>
+    
+<span class="fc" id="L233">    List&lt;GrammarInfo&gt; grammarInfos = null;</span>
+    try {
+<span class="fc" id="L235">      grammarInfos = scanForGrammars();</span>
+    }
+<span class="fc" id="L237">    catch (final GrammarException e) {</span>
+      // 'ignore' for failOnGrammarError should not lead to throwing a GrammarException
+      // 'first' and 'last' for failOnGrammarError must lead to throw a MojoExecutionException
+<span class="fc" id="L240">      getLog().error(e.getMessage() + &quot; while failOnGrammarError is '&quot; + failOnGrammarError + &quot;'&quot;);</span>
+<span class="fc" id="L241">      throw new MojoExecutionException(e.getMessage(), e.getCause());</span>
+<span class="fc" id="L242">    }</span>
+    
+<span class="fc bfc" id="L244" title="All 2 branches covered.">    if (grammarInfos == null //</span>
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">        || grammarInfos.size() == 0) {</span>
+      
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">      getLog().info(&quot;Nothing to generate in source directory '&quot; + sourceDirectory + &quot;': &quot;</span>
+          + (grammarInfos == null ? &quot;no grammars&quot; : &quot;all generated parsers are up to date&quot;));
+      // here we still need to add the compile source roots so we do not return
+      
+    } else {
+      
+      try {
+<span class="fc" id="L254">        determineNonGeneratedCompileSourceRoots();</span>
+      }
+<span class="nc" id="L256">      catch (final PluginException e) {</span>
+        // note-jacoco: quite impossible to set a test case for here
+        // failOnPluginError == 'true' will throw a MojoExecutionException
+<span class="nc" id="L259">        handlePluginException(e);</span>
+        // failOnPluginError == 'false'
+<span class="nc" id="L261">        return;</span>
+<span class="fc" id="L262">      }</span>
+      
+<span class="fc" id="L264">      int nb = 0;</span>
+<span class="fc bfc" id="L265" title="All 2 branches covered.">      for (final GrammarInfo gi : grammarInfos) {</span>
+        try {
+<span class="fc" id="L267">          processGrammar(gi);</span>
+<span class="fc" id="L268">          nb++;</span>
+        }
+<span class="fc" id="L270">        catch (final ProcessorException e) {</span>
+<span class="fc" id="L271">          handleProcessorException(e);</span>
+<span class="fc" id="L272">        }</span>
+<span class="fc" id="L273">      }</span>
+<span class="fc" id="L274">      getLog().info(&quot;Processed &quot; + nb + &quot; grammar(s) successfully and &quot; + (grammarInfos.size() - nb)</span>
+          + &quot; with errors&quot;);
+      
+<span class="fc bfc" id="L277" title="All 2 branches covered.">      if (processorErrorToIgnore) {</span>
+        // failOnProcessorError == 'ignore'
+<span class="fc" id="L279">        return;</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">      } else if (processorErrorFailure) {</span>
+        // failOnProcessorError == 'last'
+<span class="fc" id="L282">        throw new MojoExecutionException(</span>
+            &quot;Returning a build error as encountered one or more processor exceptions&quot;);
+      }
+    }
+    
+<span class="fc bfc" id="L287" title="All 2 branches covered.">    for (final File outputDirectory : getGoalOutputDirectories()) {</span>
+<span class="fc" id="L288">      addCompileSourceRoot(outputDirectory);</span>
+    }
+<span class="fc" id="L290">  }</span>
+  
+  /** True to tell the caller to ignore the grammar processing error. */
+<span class="fc" id="L293">  private boolean processorErrorToIgnore = false;</span>
+  
+  /**
+   * True to tell {@link #execute()} to return a build failure on grammar processing 'last' error.
+   */
+<span class="fc" id="L298">  private boolean processorErrorFailure = false;</span>
+  
+  /**
+   * Transforms the plugin configuration exception in a build error if the plugin is configured to
+   * fail on plugin configuration errors, otherwise just logs the error.
+   *
+   * @param e - the plugin configuration exception
+   * @throws MojoExecutionException if the plugin is configured to fail on plugin configuration
+   *           error
+   */
+  private void handlePluginException(final PluginException e) throws MojoExecutionException {
+<span class="fc bfc" id="L309" title="All 2 branches covered.">    if (failOnPluginError) {</span>
+<span class="fc" id="L310">      getLog().error(e.getMessage());</span>
+<span class="fc" id="L311">      throw new MojoExecutionException(e.getMessage(), e.getCause());</span>
+    } else {
+<span class="fc" id="L313">      getLog().error(e.getMessage());</span>
+<span class="fc" id="L314">      getLog().info(&quot;Continuing to next execution as failOnPluginError is set to 'false'&quot;);</span>
+    }
+<span class="fc" id="L316">  }</span>
+  
+  /**
+   * Transforms the grammar processing exception in a build error if the plugin is configured to
+   * fail on 'first' grammar processing error, otherwise logs the error and sets flags for 'last'
+   * and 'ignore' values.
+   *
+   * @param e - the grammar processing exception
+   * @throws MojoExecutionException if the plugin is configured to fail on grammar processing error
+   */
+  private void handleProcessorException(final ProcessorException e) throws MojoExecutionException {
+<span class="fc bfc" id="L327" title="All 2 branches covered.">    if (&quot;first&quot;.equals(failOnProcessorError)) {</span>
+<span class="fc" id="L328">      getLog().error(e.getMessage());</span>
+<span class="fc" id="L329">      throw new MojoExecutionException(e.getMessage(), e.getCause());</span>
+<span class="fc bfc" id="L330" title="All 2 branches covered.">    } else if (&quot;last&quot;.equals(failOnProcessorError)) {</span>
+<span class="fc" id="L331">      processorErrorFailure = true;</span>
+<span class="fc" id="L332">      getLog().error(e.getMessage());</span>
+<span class="fc" id="L333">      getLog().info(&quot;Continuing current execution as failOnProcessorError is set to 'last'&quot;);</span>
+    } else { // 'ignore'
+<span class="fc" id="L335">      processorErrorToIgnore = true;</span>
+<span class="fc" id="L336">      getLog().error(e.getMessage());</span>
+<span class="fc" id="L337">      getLog().info(&quot;Continuing to next execution as failOnProcessorError is set to 'ignore'&quot;);</span>
+    }
+<span class="fc" id="L339">  }</span>
+  
+  /**
+   * Checks valid values for different options.
+   *
+   * @throws PluginException if sourceDirectory does not exist or is not a directory
+   */
+  void checkOptions() throws PluginException {
+    
+    /* sourceDirectory */
+    // here it can be null; if so it will be initialized to a default value by each processor;
+    // and if not null, maven internals seems to always convert relative paths to an absolute ones
+<span class="fc" id="L351">    getLog().debug(&quot;sourceDirectory is '&quot; + sourceDirectory + &quot;'&quot;);</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">    if (sourceDirectory != null) {</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">      if (!sourceDirectory.exists()) {</span>
+<span class="fc" id="L354">        throw new PluginException(&quot;sourceDirectory '&quot; + sourceDirectory + &quot;' does not exist&quot;);</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">      } else if (!sourceDirectory.isDirectory()) {</span>
+<span class="fc" id="L356">        throw new PluginException(&quot;sourceDirectory '&quot; + sourceDirectory + &quot;' is not a directory&quot;);</span>
+      }
+    }
+    
+    /* timestampDeltaMs */
+<span class="fc bfc" id="L361" title="All 2 branches covered.">    if (timestampDeltaMs &lt; 0L) {</span>
+<span class="fc" id="L362">      getLog().info(&quot;negative timestampDeltaMs '&quot; + timestampDeltaMs</span>
+          + &quot;', so grammars will always be processed&quot;);
+    } else {
+<span class="fc" id="L365">      getLog().debug(&quot;timestampDeltaMs is '&quot; + timestampDeltaMs + &quot;'&quot;);</span>
+    }
+    
+    /* failOnPluginError */
+<span class="fc" id="L369">    getLog().debug(&quot;failOnPluginError is '&quot; + failOnPluginError + &quot;'&quot;);</span>
+    
+    /* failOnGrammarError */
+<span class="fc bfc" id="L372" title="All 2 branches covered.">    switch (failOnGrammarError.toLowerCase()) {</span>
+    case &quot;first&quot;:
+    case &quot;last&quot;:
+    case &quot;ignore&quot;:
+<span class="fc" id="L376">      failOnGrammarError = failOnGrammarError.toLowerCase();</span>
+<span class="fc" id="L377">      getLog().debug(&quot;failOnGrammarError is '&quot; + failOnGrammarError + &quot;'&quot;);</span>
+<span class="fc" id="L378">      break;</span>
+    default:
+<span class="fc" id="L380">      getLog().warn(&quot;invalid value '&quot; + failOnGrammarError</span>
+          + &quot;' for failOnGrammarError parameter; must be 'first', 'last' or 'ignore';&quot;
+          + &quot; kept to default 'first'&quot;);
+<span class="fc" id="L383">      failOnGrammarError = &quot;first&quot;;</span>
+      break;
+    }
+    
+    /* failOnProcessorError */
+<span class="fc bfc" id="L388" title="All 2 branches covered.">    switch (failOnProcessorError.toLowerCase()) {</span>
+    case &quot;first&quot;:
+    case &quot;last&quot;:
+    case &quot;ignore&quot;:
+<span class="fc" id="L392">      failOnProcessorError = failOnProcessorError.toLowerCase();</span>
+<span class="fc" id="L393">      getLog().debug(&quot;failOnProcessorError is '&quot; + failOnProcessorError + &quot;'&quot;);</span>
+<span class="fc" id="L394">      break;</span>
+    default:
+<span class="fc" id="L396">      getLog().warn(&quot;invalid value '&quot; + failOnProcessorError</span>
+          + &quot;' for failOnProcessorError parameter; must be 'first', 'last' or 'ignore';&quot;
+          + &quot; kept to default 'first'&quot;);
+<span class="fc" id="L399">      failOnProcessorError = &quot;first&quot;;</span>
+      break;
+    }
+<span class="fc" id="L402">  }</span>
+  
+  /**
+   * Checks for consistent options &quot;grammar file encoding&quot; and &quot;language&quot; between the preprocessor
+   * and the javacc processor.
+   *
+   * @param b1 - the preprocessor arguments bean
+   * @param b2 - the javacc arguments bean
+   * @param preproc - the preprocessor name
+   * @throws PluginException if inconsistent option(s)
+   */
+  void checkConsistentSpecificOptions(final AbstractArgumentsBean b1,
+      final AbstractArgumentsBean b2, final String preproc) throws PluginException {
+    
+<span class="fc" id="L416">    boolean hasErr = false;</span>
+    
+<span class="fc" id="L418">    final String jjtGFE = b1.grammarFileEncodingOptionValue;</span>
+<span class="fc" id="L419">    final String jjGFE = b2.grammarFileEncodingOptionValue;</span>
+<span class="fc" id="L420">    final String defGFE = AbstractArgumentsBean.defaultGrammarFileEncoding;</span>
+    // negated condition of consistent explicit and default option values
+<span class="fc bfc" id="L422" title="All 10 branches covered.">    if (!(jjtGFE != null &amp;&amp; (jjGFE == null || jjtGFE.equals(jjGFE))</span>
+<span class="pc bpc" id="L423" title="1 of 2 branches missed.">        || jjtGFE == null &amp;&amp; (jjGFE == null || jjGFE.equals(defGFE)))) {</span>
+<span class="fc" id="L424">      hasErr = true;</span>
+<span class="pc bpc" id="L425" title="2 of 4 branches missed.">      getLog().warn(&quot;Grammar file encodings are inconsistent: &quot; + preproc + &quot;: '&quot;</span>
+          + (jjtGFE != null ? jjtGFE + &quot;'&quot; : defGFE + &quot;' (default)&quot;) + &quot;, javacc: '&quot;
+          + (jjGFE != null ? jjGFE + &quot;'&quot; : defGFE + &quot;' (default)&quot;));
+    }
+    
+<span class="fc" id="L430">    final Language jjtLang = b1.languageOptionValue;</span>
+<span class="fc" id="L431">    final Language jjLang = b2.languageOptionValue;</span>
+<span class="fc" id="L432">    final Language defLang = AbstractArgumentsBean.defaultLanguage;</span>
+    // negated condition of consistent explicit and default option values
+<span class="fc bfc" id="L434" title="All 10 branches covered.">    if (!(jjtLang != null &amp;&amp; (jjLang == null || jjtLang.equals(jjLang))</span>
+<span class="pc bpc" id="L435" title="1 of 2 branches missed.">        || jjtLang == null &amp;&amp; (jjLang == null || jjLang.equals(defLang)))) {</span>
+<span class="fc" id="L436">      hasErr = true;</span>
+<span class="pc bpc" id="L437" title="2 of 4 branches missed.">      getLog().warn(&quot;Languages are inconsistent: &quot; + preproc + &quot;: '&quot;</span>
+          + (jjtLang != null ? jjtLang + &quot;'&quot; : defLang + &quot;' (default)&quot;) + &quot;, javacc: '&quot;
+          + (jjLang != null ? jjLang + &quot;'&quot; : defLang + &quot;' (default)&quot;));
+    }
+    
+<span class="fc bfc" id="L442" title="All 2 branches covered.">    if (hasErr) {</span>
+<span class="fc" id="L443">      throw new PluginException(&quot;Inconsistent option(s)&quot;);</span>
+    }
+<span class="fc" id="L445">  }</span>
+  
+  /**
+   * Initializes (some default values specific to the processor(s) and those ones).
+   *
+   * @throws PluginException if invalid option value
+   */
+  protected abstract void initProcessor() throws PluginException;
+  
+  /**
+   * Scans the configured source directory for grammar files which need processing.
+   *
+   * @return a list of grammar infos describing the found grammar files, may be &lt;code&gt;null&lt;/code&gt; if
+   *         no grammar in the directory, and may be empty if no stale grammar found
+   * @throws GrammarException if some grammar file could not be read or parsed
+   */
+  List&lt;GrammarInfo&gt; scanForGrammars() throws GrammarException {
+<span class="fc" id="L462">    getLog().debug(&quot;Scanning for grammars in '&quot; + sourceDirectory + &quot;'&quot;);</span>
+<span class="fc" id="L463">    final GrammarDirectoryScanner gds = //</span>
+<span class="fc" id="L464">        new GrammarDirectoryScanner(getLog(), getLanguage(), getGrammarFileEncoding());</span>
+<span class="fc" id="L465">    gds.dsSetExcludes(excludes);</span>
+<span class="fc" id="L466">    gds.dsSetIncludes(includes);</span>
+<span class="fc" id="L467">    gds.dsSetBasedir(sourceDirectory);</span>
+<span class="fc" id="L468">    gds.setJarsLastTS(computeLastTS());</span>
+<span class="fc" id="L469">    gds.setOutputDirectories(getProcessorOutputDirectories());</span>
+<span class="fc" id="L470">    gds.setTimestampDeltaMs(timestampDeltaMs);</span>
+<span class="fc" id="L471">    final List&lt;GrammarInfo&gt; grammarInfos = gds.scanForGrammars(failOnGrammarError);</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">    getLog().debug(&quot;Found grammars: &quot;</span>
+<span class="fc" id="L473">        + (grammarInfos == null ? &quot;none&quot; : Arrays.toString(grammarInfos.toArray())));</span>
+<span class="fc" id="L474">    return grammarInfos;</span>
+  }
+  
+  /**
+   * Computes the most recent lastModified timestamp of the dependencies jars.
+   *
+   * @return the most recent lastModified timestamp of the dependencies jars
+   */
+  long computeLastTS() {
+<span class="fc" id="L483">    long lastTS = 0L;</span>
+    // core
+<span class="fc" id="L485">    lastTS = updateTS(&quot;META-INF/maven/org.javacc/core&quot;, lastTS);</span>
+    // generator
+<span class="fc" id="L487">    final Language lang = getLanguage();</span>
+<span class="pc bpc" id="L488" title="1 of 2 branches missed.">    if (lang == null) {</span>
+      // may be normal if running a tool's version &lt; 8
+      // note-jacoco: no test case set for here
+<span class="nc" id="L491">      getLog().info(&quot;No code generator configured, check if normal (i.e. running version &lt; 8)&quot;);</span>
+    } else {
+<span class="fc" id="L493">      lastTS = updateTS(&quot;META-INF/maven/org.javacc.generator/&quot; + lang.subDir, lastTS);</span>
+      // custom template(s)
+<span class="fc" id="L495">      lastTS = updateTS(&quot;templates/&quot; + lang.subDir, lastTS);</span>
+    }
+<span class="fc" id="L497">    return lastTS;</span>
+  }
+  
+  /**
+   * Updates the most recent lastModified timestamp of the dependencies jars with the jar of a given
+   * resource.
+   *
+   * @param name - the name of a resource included in a jar
+   * @param inLastTS - the current timestamp value
+   * @return the updated timestamp value: the one of the jar containing the given resource if more
+   *         recent than the current one, otherwise the current one
+   */
+  long updateTS(final String name, final long inLastTS) {
+<span class="fc" id="L510">    long outLastTS = inLastTS;</span>
+<span class="pc bpc" id="L511" title="1 of 2 branches missed.">    if (name != null) {</span>
+<span class="fc" id="L512">      final URL url = Thread.currentThread().getContextClassLoader().getResource(name);</span>
+<span class="fc" id="L513">      getLog().debug(&quot;Found url '&quot; + url + &quot;' containing resource '&quot; + name + &quot;'&quot;);</span>
+<span class="fc bfc" id="L514" title="All 2 branches covered.">      if (url != null) {</span>
+        // urlName =
+        // jar:file:/C:/Users/.../java/8.1.0-SNAPSHOT/java-8.1.0-SNAPSHOT.jar!/META-INF/maven/org.javacc.generator/java
+<span class="fc" id="L517">        final String urlName = url.getPath();</span>
+        // jarName =
+        // file:/C:/Users/.../java/8.1.0-SNAPSHOT/java-8.1.0-SNAPSHOT.jar!/META-INF/maven/org.javacc.generator/java
+        // must remove leading &quot;file:&quot; and trailing &quot;!...&quot;
+<span class="fc" id="L521">        final String jarName = urlName.substring(6, urlName.indexOf('!'));</span>
+<span class="fc" id="L522">        final long ts = new File(jarName).lastModified();</span>
+<span class="fc" id="L523">        getLog().debug(&quot;LastModified timestamp of '&quot; + jarName + &quot;' is: &quot; + ts);</span>
+<span class="pc bpc" id="L524" title="1 of 2 branches missed.">        if (ts == 0L) {</span>
+          // note-jacoco: not found a way to set a test case for here
+<span class="nc" id="L526">          getLog().warn(&quot;Non existing or badly extracted jar '&quot; + jarName + &quot;' from existing url '&quot;</span>
+              + urlName + &quot;'&quot;);
+        } else {
+<span class="fc bfc" id="L529" title="All 2 branches covered.">          if (ts &gt; outLastTS) {</span>
+<span class="fc" id="L530">            outLastTS = ts;</span>
+          }
+        }
+<span class="fc" id="L533">      } else {</span>
+        // note-jacoco: no test case set for here
+<span class="fc" id="L535">        getLog()</span>
+<span class="fc" id="L536">            .warn(&quot;No dependent jar found for resource '&quot; + name + &quot;'; check plugin configuration&quot;);</span>
+      }
+    }
+<span class="fc" id="L539">    return outLastTS;</span>
+  }
+  
+  /**
+   * Abstract getter.
+   *
+   * @return the array of absolute paths to the directories where the (current) processor will
+   *         output its generated files, never &lt;code&gt;null&lt;/code&gt;
+   */
+  protected abstract File[] getProcessorOutputDirectories();
+  
+  /**
+   * Abstract getter.
+   *
+   * @return the array of the goal mojo's processor(s) output directories that will be registered as
+   *         compile source roots in the project, never &lt;code&gt;null&lt;/code&gt;
+   */
+  protected abstract File[] getGoalOutputDirectories();
+  
+  /**
+   * Registers the specified directory as a compile source root for the current project.
+   *
+   * @param directory - the absolute path to the directory to add, must not be &lt;code&gt;null&lt;/code&gt;
+   */
+  void addCompileSourceRoot(final File directory) {
+    // project looks never null
+<span class="fc" id="L565">    project.addCompileSourceRoot(directory.getAbsolutePath());</span>
+<span class="fc" id="L566">    getLog().debug(</span>
+<span class="fc" id="L567">        &quot;Added (output) directory '&quot; + directory.getAbsolutePath() + &quot;' as a compile source root&quot;);</span>
+<span class="fc" id="L568">  }</span>
+  
+  /**
+   * Determines those compile source roots of the project that do not reside below the project's
+   * build directories.&lt;br&gt;
+   * These compile source roots are assumed to contain hand-crafted sources that must not be
+   * overwritten with generated files.&lt;br&gt;
+   * In most cases, this is simply &quot;${project.build.sourceDirectory}&quot;.
+   *
+   * @throws PluginException if the compile source roots could not be determined (because of an
+   *           error in getting a canonical path)
+   */
+  void determineNonGeneratedCompileSourceRoots() throws PluginException {
+<span class="fc" id="L581">    nonGeneratedCompileSourceRoots = new ArrayList&lt;File&gt;();</span>
+    try {
+<span class="fc" id="L583">      final String targetPrefix = new File(project.getBuild().getDirectory()).getCanonicalPath()</span>
+          + File.separator;
+<span class="fc" id="L585">      getLog().debug(&quot;sourceDirectory = '&quot; + sourceDirectory + &quot;'&quot;);</span>
+<span class="fc bfc" id="L586" title="All 2 branches covered.">      for (final String csRoot : project.getCompileSourceRoots()) {</span>
+<span class="fc" id="L587">        final File compileSourceRoot = new File(csRoot);</span>
+        // maven internals makes compileSourceRoot absolute
+<span class="fc" id="L589">        final String compileSourceRootPath = compileSourceRoot.getCanonicalPath();</span>
+<span class="fc bfc" id="L590" title="All 2 branches covered.">        if (compileSourceRoot.getAbsolutePath().equals(sourceDirectory.getAbsolutePath()) //</span>
+<span class="fc bfc" id="L591" title="All 2 branches covered.">            || !compileSourceRootPath.startsWith(targetPrefix)) {</span>
+<span class="fc" id="L592">          nonGeneratedCompileSourceRoots.add(compileSourceRoot);</span>
+<span class="fc" id="L593">          getLog().debug(&quot;compile source root: '&quot; + compileSourceRoot + &quot;' is a non generated one&quot;);</span>
+        } else {
+<span class="fc" id="L595">          getLog().debug(&quot;compile source root: '&quot; + compileSourceRoot + &quot;' is a generated one&quot;);</span>
+        }
+<span class="fc" id="L597">      }</span>
+    }
+<span class="nc" id="L599">    catch (final IOException | SecurityException e) {</span>
+      // note-jacoco: quite impossible to set a test case for here
+<span class="nc" id="L601">      throw new PluginException(&quot;Failed to determine non-generated source roots&quot;, e);</span>
+<span class="fc" id="L602">    }</span>
+<span class="fc" id="L603">  }</span>
+  
+  /**
+   * Tells the subclass to process the specified grammar file (it may execute one or more
+   * processors).
+   *
+   * @param grammarInfo - the grammar info describing the grammar file to process, must not be
+   *          &lt;code&gt;null&lt;/code&gt;
+   * @throws ProcessorException if the invocation of the processor(s) failed or if the processor(s)
+   *           reported a non-zero exit code or if the generated files could not be copied
+   */
+  protected abstract void processGrammar(GrammarInfo grammarInfo) throws ProcessorException;
+  
+  /**
+   * Runs a processor on a specified grammar file.
+   *
+   * @param grammarInfo - the grammar info describing the grammar file to process, must not be
+   *          &lt;code&gt;null&lt;/code&gt;
+   * @param intermediateDirectories - the array of intermediate output directories where the
+   *          processor will write the generated files (instead of the configured output
+   *          directories, see {@link #copyGrammarOutput(File, File, String, boolean)})
+   * @param copyGenFiles - true to copy the generated files, false otherwise
+   * @throws ProcessorException if the invocation of the processor failed or if the processor
+   *           reported a non-zero exit code or if the generated files could not be copied
+   */
+  void runProcessorOnGrammar(final GrammarInfo grammarInfo, final File[] intermediateDirectories,
+      final boolean copyGenFiles) throws ProcessorException {
+<span class="fc" id="L630">    final File gramFile = grammarInfo.getAbsoluteGrammarFile();</span>
+<span class="fc" id="L631">    final File gramDirectory = gramFile.getParentFile();</span>
+    // the output directories may be sub directories of the given intermediate directories
+<span class="fc" id="L633">    final File[] intermedOutputDirectories = new File[intermediateDirectories.length];</span>
+<span class="fc bfc" id="L634" title="All 2 branches covered.">    for (int i = 0; i &lt; intermediateDirectories.length; i++) {</span>
+<span class="fc" id="L635">      intermedOutputDirectories[i] = (new File(intermediateDirectories[i],</span>
+<span class="fc" id="L636">          grammarInfo.getParserSubDirectory())).getAbsoluteFile();</span>
+    }
+    
+    // run the processor to generate files
+<span class="fc" id="L640">    runProcessor(gramFile, intermediateDirectories);</span>
+    
+    // copy generated files
+<span class="fc bfc" id="L643" title="All 2 branches covered.">    for (int i = 0; i &lt; intermediateDirectories.length; i++) {</span>
+<span class="fc" id="L644">      getLog().debug(&quot;1st copyGrammarOutput: i=&quot; + i + &quot;, gi.subd='&quot;</span>
+<span class="fc" id="L645">          + grammarInfo.getParserSubDirectory() + &quot;':&quot;);</span>
+<span class="fc" id="L646">      copyGrammarOutput(intermediateDirectories[i], getProcessorOutputDirectories()[i],</span>
+<span class="fc" id="L647">          grammarInfo.getParserSubDirectory(),</span>
+          // &quot;*&quot;,
+          copyGenFiles);
+    }
+    
+<span class="fc" id="L652">    getLog().debug(&quot;2nd copyGrammarOutput: copyGenFiles=&quot; + copyGenFiles + &quot;, gi.srcd='&quot;</span>
+<span class="fc" id="L653">        + grammarInfo.getSourceDirectory() + &quot;', ingcsr='&quot;</span>
+<span class="fc" id="L654">        + isNonGeneratedCompileSourceRoot(grammarInfo.getSourceDirectory()) + &quot;':&quot;);</span>
+<span class="fc bfc" id="L655" title="All 2 branches covered.">    if (copyGenFiles &amp;&amp; //</span>
+<span class="fc bfc" id="L656" title="All 2 branches covered.">        !isNonGeneratedCompileSourceRoot(grammarInfo.getSourceDirectory())) {</span>
+      // if asked to copy the generated files and if the grammar does not reside in a declared
+      // source root, copy source files which are beside the grammar
+<span class="fc" id="L659">      copyGrammarOutput( //</span>
+          gramDirectory, //
+<span class="fc" id="L661">          getProcessorOutputDirectories()[0], //</span>
+<span class="fc" id="L662">          grammarInfo.getParserSubDirectory(), //</span>
+          // &quot;*&quot;,
+          false);
+    } else {
+      // but if the grammar does reside in a declared source root,
+      // do not copy them (otherwise we would get duplicated classes)
+    }
+    
+<span class="fc bfc" id="L670" title="All 2 branches covered.">    if (!keepIntermediateDirectory) {</span>
+<span class="fc" id="L671">      deleteIntermediateDirectories(intermediateDirectories);</span>
+    } else {
+<span class="fc" id="L673">      getLog().info(&quot;Intermediate directory(ies) '&quot; + displayDirectories(intermediateDirectories)</span>
+          + &quot;' not deleted as requested&quot;);
+    }
+<span class="fc" id="L676">  }</span>
+  
+  /**
+   * @param directories - an array of directories
+   * @return the string of the comma separated list of directories
+   */
+  protected static String displayDirectories(final File[] directories) {
+<span class="pc bpc" id="L683" title="1 of 2 branches missed.">    if (directories == null) {</span>
+<span class="nc" id="L684">      return null;</span>
+    }
+<span class="fc" id="L686">    String msg = &quot;&quot;;</span>
+<span class="fc bfc" id="L687" title="All 2 branches covered.">    for (int i = 0; i &lt; directories.length; i++) {</span>
+      try {
+<span class="fc" id="L689">        msg += directories[i].getCanonicalPath();</span>
+      }
+<span class="nc" id="L691">      catch (final IOException e) {</span>
+<span class="nc" id="L692">        msg += &quot;IOException on element of intermediateDirectories&quot;;</span>
+<span class="fc" id="L693">      }</span>
+<span class="pc bpc" id="L694" title="1 of 2 branches missed.">      if (i &lt; directories.length - 1) {</span>
+<span class="nc" id="L695">        msg += &quot;, &quot;;</span>
+      }
+    }
+<span class="fc" id="L698">    return msg;</span>
+  }
+  
+  /**
+   * Runs a processor on a given grammar file generating files into the given output directories.
+   *
+   * @param grammar - the grammar file
+   * @param outputDirectories - the output directories
+   * @throws ProcessorException if the invocation of the processor failed or if the processor
+   *           reported a non-zero exit code
+   */
+  protected abstract void runProcessor(final File grammar, final File[] outputDirectories)
+      throws ProcessorException;
+  
+  /**
+   * Scans a given origin directory and its subdirectories for generated files and copies them under
+   * the given destination directory, taking in account the parser directory deriving from the
+   * parser package if any.&lt;br&gt;
+   * It is intended that the resulting destination directory will be a compile source root.&lt;br&gt;
+   * An output file is only copied if it doesn't already exist in a compile source root.&lt;br&gt;
+   * This prevents duplicate class errors during compilation in case the user provided customized
+   * files in a compile source directory like &lt;code&gt;src/main/java&lt;/code&gt; or similar.
+   *
+   * @param origin - the (absolute) path to the directory to scan for the to-be-copied generated
+   *          output files, must not be &lt;code&gt;null&lt;/code&gt;
+   * @param destination - the (absolute) path to the destination directory into which the output
+   *          files should be copied, must not be &lt;code&gt;null&lt;/code&gt;
+   * @param subDirectory - the name of the destination sub directory for the output files, must not
+   *          be &lt;code&gt;null&lt;/code&gt;, and must be empty or terminated by a file separator
+   * @param copyAnnotatedFile - true to also copy the jj file (as generated / annotated), false
+   *          otherwise
+   * @throws ProcessorException if the generated files could not be copied
+   */
+  void copyGrammarOutput(final File origin, final File destination, final String subDirectory,
+      final boolean copyAnnotatedFile) throws ProcessorException {
+    
+    final List&lt;File&gt; tbcFiles;
+<span class="fc" id="L735">    String ext = &quot;&quot;;</span>
+<span class="fc" id="L736">    final Language lang = getLanguage();</span>
+    try {
+<span class="fc" id="L738">      ext = &quot;**/*&quot; + lang.extension;</span>
+<span class="fc" id="L739">      tbcFiles = FileUtils.getFiles(origin, ext, null);</span>
+<span class="fc bfc" id="L740" title="All 2 branches covered.">      if (copyAnnotatedFile) {</span>
+<span class="fc" id="L741">        ext = &quot;**/*.jj&quot;;</span>
+<span class="fc" id="L742">        tbcFiles.addAll(FileUtils.getFiles(origin, ext, null));</span>
+      }
+<span class="pc bpc" id="L744" title="1 of 2 branches missed.">      if (lang.otherExtensions != null) {</span>
+<span class="fc" id="L745">        ext = &quot;**/*&quot; + lang.otherExtensions;</span>
+<span class="fc" id="L746">        tbcFiles.addAll(FileUtils.getFiles(origin, ext, null));</span>
+      }
+    }
+<span class="nc" id="L749">    catch (final IOException e) {</span>
+<span class="nc" id="L750">      throw new ProcessorException(</span>
+          &quot;Failed to get generated files '&quot; + ext + &quot;' within '&quot; + origin + &quot;'&quot;, e);
+<span class="fc" id="L752">    }</span>
+    
+<span class="fc bfc" id="L754" title="All 2 branches covered.">    for (final File tbcFile : tbcFiles) {</span>
+<span class="fc" id="L755">      final String gf = tbcFile.getPath().substring(1 + origin.getPath().length());</span>
+<span class="fc" id="L756">      final String outputPath = subDirectory + gf;</span>
+<span class="fc" id="L757">      final File outputFile = new File(destination, outputPath);</span>
+<span class="fc" id="L758">      final File sourceFile = findIfIsNonGeneratedSourceFile(outputPath);</span>
+      
+<span class="fc bfc" id="L760" title="All 2 branches covered.">      if (sourceFile == null) {</span>
+        try {
+<span class="fc" id="L762">          FileUtils.copyFile(tbcFile, outputFile);</span>
+<span class="fc" id="L763">          getLog().debug(&quot;Copied generated file '&quot; + tbcFile + &quot;' to '&quot; + outputFile + &quot;'&quot;);</span>
+        }
+<span class="nc" id="L765">        catch (final IOException e) {</span>
+<span class="nc" id="L766">          throw new ProcessorException(</span>
+              &quot;Failed to copy generated file '&quot; + tbcFile + &quot;' to '&quot; + outputFile + &quot;'&quot;, e);
+<span class="fc" id="L768">        }</span>
+      } else {
+<span class="fc" id="L770">        getLog().debug(&quot;Skipping copying user file '&quot; + outputPath</span>
+            + &quot;' as custom or generated one '&quot; + sourceFile + &quot;' exists&quot;);
+      }
+<span class="fc" id="L773">    }</span>
+<span class="fc" id="L774">  }</span>
+  
+  /**
+   * Determines whether a given file exists in any of the non generated compile source roots
+   * registered with the current Maven project or in any of the processor output directories.
+   *
+   * @param filename - the name of the file to check, relative to a compile source root or a
+   *          processor output directory, must not be &lt;code&gt;
+   *     null&lt;/code&gt;
+   * @return the (absolute) path to the existing source file if any, &lt;code&gt;null&lt;/code&gt; otherwise
+   */
+  File findIfIsNonGeneratedSourceFile(final String filename) {
+<span class="fc bfc" id="L786" title="All 2 branches covered.">    for (final File nonGeneratedCompileSourceRoot : nonGeneratedCompileSourceRoots) {</span>
+<span class="fc" id="L787">      final File sourceFile = new File(nonGeneratedCompileSourceRoot, filename);</span>
+<span class="fc bfc" id="L788" title="All 2 branches covered.">      if (sourceFile.exists()) {</span>
+<span class="fc" id="L789">        return sourceFile;</span>
+      }
+<span class="fc" id="L791">    }</span>
+<span class="fc bfc" id="L792" title="All 2 branches covered.">    for (final File procOutDir : getProcessorOutputDirectories()) {</span>
+<span class="fc" id="L793">      final File sourceFile = new File(procOutDir, filename);</span>
+<span class="fc bfc" id="L794" title="All 2 branches covered.">      if (sourceFile.exists()) {</span>
+<span class="fc" id="L795">        return sourceFile;</span>
+      }
+    }
+<span class="fc" id="L798">    return null;</span>
+  }
+  
+  /**
+   * True if the specified directory is a non generated compile source root of the current project,
+   * false otherwise.
+   *
+   * @param dir - the directory to check, must not be &lt;code&gt;null&lt;/code&gt;
+   * @return &lt;code&gt;true&lt;/code&gt; if the specified directory is a non generated compile source root of
+   *         the project, &lt;code&gt;false&lt;/code&gt; otherwise
+   */
+  boolean isNonGeneratedCompileSourceRoot(final File dir) {
+<span class="fc" id="L810">    return nonGeneratedCompileSourceRoots.contains(dir);</span>
+  }
+  
+  /**
+   * Deletes the specified intermediate directories.
+   *
+   * @param dirs - the directory to delete, must not be &lt;code&gt;null&lt;/code&gt;
+   */
+  void deleteIntermediateDirectories(final File[] dirs) {
+<span class="fc bfc" id="L819" title="All 2 branches covered.">    for (final File dir : dirs) {</span>
+      try {
+<span class="fc" id="L821">        FileUtils.deleteDirectory(dir);</span>
+<span class="fc" id="L822">        getLog().debug(&quot;Deleted intermediate directory '&quot; + dir + &quot;'&quot;);</span>
+      }
+<span class="nc" id="L824">      catch (final IOException e) {</span>
+        // note-jacoco: quite impossible to set a test case for here
+<span class="nc" id="L826">        getLog().warn(&quot;Failed to delete intermediate directory '&quot; + dir + &quot;'&quot;, e);</span>
+<span class="fc" id="L827">      }</span>
+    }
+<span class="fc" id="L829">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

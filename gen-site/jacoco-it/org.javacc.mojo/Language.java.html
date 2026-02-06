@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Language.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">Language.java</span></div><h1>Language.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+/**
+ * Enumeration for the different output languages and their characteristics.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ */
+<span class="fc" id="L37">public enum Language {</span>
+  /** Java */
+<span class="fc" id="L39">  JAVA(&quot;.java&quot;, LanguageHelper.AR_JJ_EXT, &quot;Java&quot;, true, false, &quot;java&quot;),</span>
+  /** C++ */
+<span class="fc" id="L41">  CPP(&quot;.cc&quot;, LanguageHelper.AR_JJ_H_EXT, &quot;C++&quot;, false, true, &quot;cpp&quot;),</span>
+  /** C# */
+<span class="fc" id="L43">  CSHARP(&quot;.cs&quot;, LanguageHelper.AR_JJ_EXT, &quot;C#&quot;, false, true, &quot;csharp&quot;), //</span>
+  /** JavaScript */
+<span class="fc" id="L45">  JAVASCRIPT(&quot;.js&quot;, LanguageHelper.AR_JJ_EXT, &quot;JS&quot;, false, true, &quot;js&quot;), //</span>
+  /** Kotlin */
+<span class="fc" id="L47">  KOTLIN(&quot;.kt&quot;, LanguageHelper.AR_JJ_EXT, &quot;Kotlin&quot;, true, false, &quot;kotlin&quot;), //</span>
+  /** Python */
+<span class="fc" id="L49">  PYTHON(&quot;.py&quot;, LanguageHelper.AR_JJ_EXT, &quot;Python&quot;, false, true, &quot;python&quot;), //</span>
+  ;
+  
+  /** Generated files main extension. Well known languages file extensions. */
+  protected final String extension;
+  
+  /** Generated files other extensions. Well known languages file extensions. */
+  protected final String[] otherExtensions;
+  
+  /** Generated files all extensions. Well known languages file extensions. */
+  protected final String[] allExtensions;
+  
+  /** CodeGenerator option. Defined in CodeGenerator.getName() int the javacc-8 repositories. */
+  protected final String cgOption;
+  
+  /** Flag telling if the corresponding generator manages package names or not. */
+  protected final Boolean usesPackage;
+  
+  /** Flag telling if the corresponding generator manages the grammar paths or not. */
+  protected final Boolean usesPath;
+  
+  /**
+   * Subdirectory appearing in different paths (in the javacc-8 generator repositories) (notably in
+   * the templates paths), corresponding to the generator.
+   */
+  protected final String subDir;
+  
+  /**
+   * Constructor.
+   *
+   * @param ext - the parser file extension
+   * @param oth - the generated files other extensions
+   * @param cgo - the CodeGenerator option
+   * @param pkg - the usesPackage flag
+   * @param pth - the usesPath flag
+   * @param dir - the subdirectory
+   */
+  Language(final String ext, final String oth[], final String cgo, final boolean pkg,
+<span class="fc" id="L87">      final boolean pth, final String dir) {</span>
+<span class="fc" id="L88">    extension = ext;</span>
+<span class="fc" id="L89">    otherExtensions = oth;</span>
+<span class="fc" id="L90">    allExtensions = new String[otherExtensions.length + 1];</span>
+<span class="fc" id="L91">    allExtensions[0] = ext;</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    for (int i = 0, j = 1; i &lt; otherExtensions.length; i++, j++) {</span>
+<span class="fc" id="L93">      allExtensions[j] = otherExtensions[i];</span>
+    }
+<span class="fc" id="L95">    cgOption = cgo;</span>
+<span class="fc" id="L96">    usesPackage = pkg;</span>
+<span class="fc" id="L97">    usesPath = pth;</span>
+<span class="fc" id="L98">    subDir = dir;</span>
+<span class="fc" id="L99">  }</span>
+  
+  /**
+   * @param value - a CodeGenerator option value
+   * @return the corresponding language
+   * @throws PluginException if invalid option value
+   */
+  public static final Language getLanguageFrom(final String value) throws PluginException {
+<span class="fc" id="L107">    final String u = value.toUpperCase();</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    if (u.equals(JAVA.cgOption.toUpperCase())) {</span>
+<span class="fc" id="L109">      return JAVA;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    } else if (u.equals(CPP.cgOption.toUpperCase())) {</span>
+<span class="fc" id="L111">      return CPP;</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    } else if (u.equals(CSHARP.cgOption.toUpperCase())) {</span>
+<span class="fc" id="L113">      return CSHARP;</span>
+    } else {
+<span class="fc" id="L115">      throw new PluginException(&quot;Invalid CodeGenerator option &quot; + value);</span>
+    }
+  }
+  
+  /**
+   * Just to hold constants used in the enum.
+   *
+   * @since 3.8.0
+   * @author Maͫzͣaͬsͨ
+   */
+<span class="nc" id="L125">  public static class LanguageHelper {</span>
+    
+    /** JavaCC file extension in an array. */
+<span class="fc" id="L128">    public static final String[] AR_JJ_EXT = {</span>
+        GrammarInfo.JJ_EXT
+    };
+    
+    /** JavaCC and C/C++ header file extensions in an array. */
+<span class="fc" id="L133">    public static final String[] AR_JJ_H_EXT = {</span>
+        GrammarInfo.JJ_EXT, &quot;.h&quot;
+    };
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

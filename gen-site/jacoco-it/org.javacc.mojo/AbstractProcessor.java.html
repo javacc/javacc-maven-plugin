@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">AbstractProcessor.java</span></div><h1>AbstractProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.plugin.logging.Log;
+
+/**
+ * Super class of the concrete processors.
+ *
+ * &lt;p&gt;
+ * Each processor is a facade to programmatically run a JavaCC generator or a preprocessor (JJTree
+ * or JTB) or the JJDoc tool.&lt;br&gt;
+ * Some goals may run a preprocessor and a generator in a row.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ * @see AbstractPluginMojo
+ * @see AbstractArgumentsBean
+ */
+abstract class AbstractProcessor {
+  
+  /** The logger. */
+  protected final Log log;
+  
+  /** The the absolute path to the (input) grammar file. */
+  protected File inputFile;
+  
+  /** The output file name. */
+  protected String outputFileName;
+  
+  /** The array of absolute paths to the intermediate output directories. */
+<span class="fc" id="L62">  protected File[] intermediateOutputDirectories = null;</span>
+  
+  /** The array of options to set the intermediate output directories. */
+<span class="fc" id="L65">  protected String[] intermedOutDirOptions = null;</span>
+  
+  /** The command line arguments. */
+  protected List&lt;String&gt; cmdLineArgs;
+  
+  /**
+   * Constructor.
+   *
+   * @param lg - the logger
+   */
+<span class="fc" id="L75">  public AbstractProcessor(final Log lg) {</span>
+<span class="fc" id="L76">    log = lg;</span>
+<span class="fc" id="L77">  }</span>
+  
+  /**
+   * Gets the name of the processor.
+   *
+   * @return the name of the processor, never &lt;code&gt;null&lt;/code&gt;
+   */
+  protected String getProcessorName() {
+<span class="fc" id="L85">    final String name = getClass().getName();</span>
+<span class="fc" id="L86">    return name.substring(name.lastIndexOf('.') + 1);</span>
+  }
+  
+  /**
+   * Runs the processor, wrapping return info; its parameters/options must have been set previously.
+   *
+   * @throws ProcessorException if the processor could not be invoked or reported a non-zero return
+   *           code
+   */
+  public void run() throws ProcessorException {
+    int rc;
+    try {
+<span class="fc" id="L98">      log.debug(&quot;Running '&quot; + getProcessorName() + &quot;'&quot;);</span>
+<span class="fc" id="L99">      rc = execute();</span>
+<span class="fc" id="L100">      log.debug(&quot;'&quot; + getProcessorName() + &quot;' returned '&quot; + rc + &quot;'&quot;);</span>
+    }
+<span class="nc" id="L102">    catch (final Exception e) {</span>
+      // note-jacoco: quite impossible to set a test case here, as processors throw exceptions
+      // mainly on IO problems, and for unsupported encoding the plugin raises before reaching
+      // here a GrammarException while trying to read the grammar file
+<span class="nc" id="L106">      throw new ProcessorException(</span>
+<span class="nc" id="L107">          &quot;Failed to execute processor '&quot; + getProcessorName() + &quot;': &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L108">    }</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    if (rc != 0) {</span>
+<span class="fc" id="L110">      throw new ProcessorException(</span>
+<span class="fc" id="L111">          &quot;Processor '&quot; + getProcessorName() + &quot;' reported exit code '&quot; + rc + &quot;'&quot;);</span>
+    }
+<span class="fc" id="L113">  }</span>
+  
+  /**
+   * Delegates execution of the processor to the concrete class; its parameters/options must have
+   * been set previously.
+   *
+   * @return the exit code of the processor, non-zero means failure
+   * @throws ProcessorException if the processor could not be invoked
+   */
+  protected abstract int execute() throws ProcessorException;
+  
+  /**
+   * Generates the array of arguments, from the configured options, the intermediate output
+   * directory and the input file.
+   *
+   * @return the arguments
+   */
+  protected String[] genArgs() {
+<span class="fc" id="L131">    final List&lt;String&gt; argsList = new ArrayList&lt;String&gt;(cmdLineArgs.size() + 2);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (final String arg : cmdLineArgs) {</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">      if (!matchOverridenOption(arg)) {</span>
+<span class="fc" id="L134">        argsList.add(arg);</span>
+      }
+<span class="fc" id="L136">    }</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    if (intermediateOutputDirectories != null) {</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">      for (int i = 0; i &lt; intermediateOutputDirectories.length; i++) {</span>
+<span class="fc" id="L139">        argsList.add(intermedOutDirOptions[i] + &quot;=\&quot;&quot; + intermediateOutputDirectories[i] + &quot;\&quot;&quot;);</span>
+      }
+    }
+<span class="fc" id="L142">    argsList.add(inputFile.getAbsolutePath());</span>
+<span class="fc" id="L143">    return (String[]) argsList.toArray(new String[argsList.size()]);</span>
+  }
+  
+  /**
+   * @param arg - the argument
+   * @return true if the given argument matches one of the option overriden by the plugin, false
+   *         otherwise.
+   */
+  abstract boolean matchOverridenOption(final String arg);
+  
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

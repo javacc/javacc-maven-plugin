@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JJDocProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">JJDocProcessor.java</span></div><h1>JJDocProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.util.Arrays;
+import org.apache.maven.plugin.logging.Log;
+
+/**
+ * Holds parameters/options and execution for the JJDoc processor.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ */
+public class JJDocProcessor extends AbstractProcessor {
+  
+  /**
+   * Constructor.
+   *
+   * @param lg - the logger
+   */
+  public JJDocProcessor(final Log lg) {
+<span class="fc" id="L48">    super(lg);</span>
+<span class="fc" id="L49">  }</span>
+  
+  @Override
+  protected int execute() throws ProcessorException {
+<span class="fc" id="L53">    final String[] args = genArgs();</span>
+<span class="fc" id="L54">    log.debug(&quot;Running 'org.javacc.jjdoc.JJDocMain.mainProgram()' with arguments: &quot;</span>
+<span class="fc" id="L55">        + Arrays.asList(args).toString());</span>
+    try {
+<span class="fc" id="L57">      final int rc = org.javacc.jjdoc.JJDocMain.mainProgram(args);</span>
+<span class="fc" id="L58">      outputFileName = args[args.length - 1];</span>
+<span class="fc" id="L59">      log.debug(&quot;'org.javacc.jjdoc.JJDocMain.mainProgram()' returned: &quot; + rc + &quot; / &quot;</span>
+<span class="fc" id="L60">          + Arrays.asList(args).toString());</span>
+<span class="fc" id="L61">      return rc;</span>
+    }
+<span class="nc" id="L63">    catch (final Exception e) {</span>
+      // note-jacoco: unable to set a test case for here even with wrong grammar encoding as the
+      // plugin raises before reaching here a GrammarException while trying to read the grammar file
+      //      e.printStackTrace();
+<span class="nc" id="L67">      throw new ProcessorException(</span>
+          &quot;Error running 'org.javacc.jjdoc.JJDocMain.mainProgram()' with arguments: &quot;
+<span class="nc" id="L69">              + Arrays.asList(args).toString(),</span>
+          e);
+    }
+  }
+  
+  @Override
+  boolean matchOverridenOption(final String arg) {
+<span class="fc" id="L76">    return false;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>

@@ -113,7 +113,9 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
     <skipTests>false</skipTests>
 
+    <!-- for deploying snapshots, releases and github pages -->
     <central.publishing.maven.plugin.version>0.9.0</central.publishing.maven.plugin.version>
+    <site.dir>${project.basedir}/gen-site</site.dir>
 
   </properties>
 
@@ -167,6 +169,56 @@ THE POSSIBILITY OF SUCH DAMAGE.
   </build>
 
   <profiles>
+
+    <profile>
+      <!-- enables using maven toolchains plugin to not depend of current JAVA_HOME setting;
+           implicitely activated -->
+      <id>with-toolchains</id>
+      <activation>
+        <file>
+          <exists>${env.USERPROFILE}/.m2/toolchains.xml</exists>
+        </file>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- lifecycle: build -->
+            <!-- phase: validate -->
+            <plugin>
+              <!-- allows to share consistent configuration (here jdk) across plugins;
+                   reads <userhome>/.m2/toolchains.xml -->
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-toolchains-plugin</artifactId>
+              <version>${maven-toolchains-plugin.version}</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-toolchains-plugin</artifactId>
+            <configuration>
+              <toolchains>
+                <jdk>
+                  <version>${toolchain.jdk.version}</version>
+                </jdk>
+              </toolchains>
+            </configuration>
+            <executions>
+              <execution>
+                <id>validate-tc</id>
+                <!-- checks that toolchains requirements are met by currently
+                      configured toolchains -->
+                <goals>
+                  <goal>toolchain</goal>
+                  <!--              <goal>select-jdk-toolchain</goal>-->
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
     <profile>
       <!-- to be used when publishing a snapshot on Sonatype Central Portal;
@@ -277,7 +329,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
               </execution>
             </executions>
           </plugin>
-          
+
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
@@ -295,7 +347,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
               <!-- stagingDirectory is the default central-staging -->
             </configuration>
           </plugin>
-          
+
         </plugins>
       </build>
     </profile>

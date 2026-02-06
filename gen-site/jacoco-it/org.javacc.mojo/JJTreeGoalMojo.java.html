@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JJTreeGoalMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Integration tests coverage</a> &gt; <a href="index.source.html" class="el_package">org.javacc.mojo</a> &gt; <span class="el_source">JJTreeGoalMojo.java</span></div><h1>JJTreeGoalMojo.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2025-2026, Marc Mazas &lt;mazas.marc@gmail.com&gt;.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the names of the copyright holders nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.javacc.mojo;
+
+import java.io.File;
+import java.util.List;
+
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
+/**
+ * The &lt;b&gt;jjtree&lt;/b&gt; goal, for generating the tree files (but not the parser files) from a JJTree
+ * grammar.&lt;br&gt;
+ * It searches the source directory for all grammar files and run JJTree once for each file it
+ * finds, managing the output directory from the user setting or the default setting, and adding it
+ * to the project-wide compile source roots.&lt;br&gt;
+ * It uses an intermediate output directory to help discard any generated file when the user wants
+ * instead his customized version he has put in any compile source root.
+ * &lt;p&gt;
+ * Detailed information about the JJTree options can be found on the
+ * &lt;a href=&quot;https://javacc.github.io/javacc/&quot;&gt;JavaCC website&lt;/a&gt;.&lt;br&gt;
+ * The code repositories can be found within &lt;a href=&quot;https://github.com/javacc&quot;&gt;JavaCC at
+ * GitHub&lt;/a&gt;.
+ *
+ * @since 3.8.0
+ * @author Maͫzͣaͬsͨ
+ */
+@Mojo(name = &quot;jjtree&quot;, defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
+<span class="fc" id="L56">public class JJTreeGoalMojo extends AbstractPluginMojo {</span>
+  
+  /** The bean handling JJTree options as command line arguments. */
+<span class="fc" id="L59">  private final JJTreeArgumentsBean jjtab = new JJTreeArgumentsBean();</span>
+  
+  /**
+   * The list of single full command line arguments, which should be in the form accepted by
+   * JJTree/JavaCC.
+   *
+   * &lt;p&gt;
+   * Arguments' values for &lt;code&gt;-CODE_GENERATOR&lt;/code&gt;, &lt;code&gt;-GRAMMAR_ENCODING&lt;/code&gt; and
+   * &lt;code&gt;-JJTREE_OUTPUT_DIRECTORY&lt;/code&gt; are read and used by the plugin; their default values
+   * (i.e. if these options are not present) are &lt;code&gt;&quot;Java&quot;&lt;/code&gt; (as for JJTree/JavaCC), system
+   * property &lt;code&gt;file.encoding&lt;/code&gt; (as for JJTree/JavaCC) and &lt;code&gt;
+   * ${project.build.directory}/generated-sources/jjtree&lt;/code&gt; (as for usual maven convention -
+   * JJTree default value is &lt;code&gt;&quot;.&quot;&lt;/code&gt;).&lt;br&gt;
+   *
+   * &lt;p&gt;
+   * The list will be passed as it is to JJTree, no control nor modification is done by the plugin,
+   * except for &lt;code&gt;-JJTREE_OUTPUT_DIRECTORY&lt;/code&gt;, whose value will be changed to an
+   * intermediate temporary directory &lt;code&gt;${project.build.directory}/jjtree-nnnnnn&lt;/code&gt;. The
+   * given output directory value will be used at the end to copy the generated files from the
+   * intermediate directory to it.
+   *
+   * &lt;p&gt;
+   * The list has no default value (except for the 3 above options) (but JJTree/JavaCC itself
+   * supplies default values).&lt;br&gt;
+   * Note that among those 3 default values, the grammar encoding one (platform file encoding) may
+   * be not adequate as most of the times the project is under an IDE and globally set to a platform
+   * independent encoding like 'UTF-8'.
+   *
+   * &lt;p&gt;
+   * Example:&lt;br&gt;
+   *
+   * &lt;pre&gt;{@code
+   * &lt;jjtreeCmdLineArgs&gt;
+   *   &lt;arg&gt;-NODE_EXTENDS=&quot;MyNode&quot;&lt;/arg&gt;
+   *   &lt;arg&gt;-MuLtI=true&lt;/arg&gt;
+   *   &lt;arg&gt;-code_generator:&quot;Java&quot;&lt;/arg&gt;
+   *   &lt;arg&gt;-Grammar_Encoding=&quot;UTF-8&quot;&lt;/arg&gt;
+   *   &lt;arg&gt;-JJTREE_OUTPUT_DIRECTORY=&quot;$}{{@code
+   * project.build.directory
+   * }}{@code /gen-src/jjt&quot;&lt;/arg&gt;
+   * &lt;/jjtreeCmdLineArgs&gt;
+   * }&lt;/pre&gt;
+   *
+   * &lt;br&gt;
+   * Note that the &lt;code&gt;jjtreeCmdLineArgs&lt;/code&gt; parameter is of type {@code List&lt;String&gt;}, which
+   * implies that the inner tags names can have any names and may be appear many times (like
+   * &lt;code&gt;arg&lt;/code&gt; above).&lt;br&gt;
+   * Note also that if the project has a parent which also configures the plugin with parameters (to
+   * factorize them for the children for example), the child parameters will complement / replace
+   * the parent's ones for those that are absent / present in the parent; so
+   * &lt;ul&gt;
+   * &lt;li&gt;if one wants to get rid of (all) the parent's ones, he must use the &lt;code&gt;
+   * combine.self=&quot;override&quot;&lt;/code&gt; attribute at the list level in the child, and&lt;/li&gt;
+   * &lt;li&gt;if one wants to replace some of the parent's ones and add new ones in the child it is
+   * recommended to use distinct tag names in the parent, the same tag names in the child for those
+   * that must be replaced and another tag name or other tag names for the new ones.&lt;/li&gt;
+   * &lt;/ul&gt;
+   * See also &lt;a href=
+   * &quot;https://github.com/javacc/javacc-maven-plugin/readme.md#processor_parameters&quot;&gt;Processor
+   * parameters&lt;/a&gt;.
+   */
+  @Parameter(property = &quot;javacc.jjtreeCmdLineArgs&quot;) //
+  protected List&lt;String&gt; jjtreeCmdLineArgs;
+  
+  @Override
+  protected void initProcessor() throws PluginException {
+<span class="fc bfc" id="L125" title="All 2 branches covered.">    if (includes == null) {</span>
+<span class="fc" id="L126">      includes = new String[] {</span>
+          &quot;**/*.jjt&quot;
+      };
+    }
+<span class="fc bfc" id="L130" title="All 2 branches covered.">    if (sourceDirectory == null) {</span>
+<span class="fc" id="L131">      sourceDirectory = new File(project.getBasedir(), JJTreeArgumentsBean.defSrcSubDir);</span>
+<span class="fc" id="L132">      getLog().debug(&quot;sourceDirectory initialized to '&quot; + sourceDirectory + &quot;'&quot;);</span>
+    }
+    
+    // mojo's log injected after the mojo is constructed, so wait until now to pass it to the bean
+<span class="fc" id="L136">    jjtab.log = getLog();</span>
+<span class="fc" id="L137">    jjtab.setProcCmdLineArgs(jjtreeCmdLineArgs);</span>
+<span class="fc" id="L138">    jjtab.findSpecificOptions(project, &quot;jjtreeCmdLineArgs&quot;);</span>
+<span class="fc" id="L139">  }</span>
+  
+  @Override
+  protected void processGrammar(final GrammarInfo grammarInfo) throws ProcessorException {
+<span class="fc" id="L143">    final String ts = String.valueOf(System.currentTimeMillis()).substring(6);</span>
+<span class="fc" id="L144">    final File jjtree = new File(project.getBuild().getDirectory(), &quot;jjtree-&quot; + ts);</span>
+<span class="fc" id="L145">    final File[] dirs = new File[] {</span>
+        jjtree
+    };
+<span class="fc" id="L148">    runProcessorOnGrammar(grammarInfo, dirs, true);</span>
+<span class="fc" id="L149">  }</span>
+  
+  @Override
+  protected void runProcessor(final File gram, final File[] dirs) throws ProcessorException {
+<span class="fc" id="L153">    final JJTreeProcessor jjp = new JJTreeProcessor(getLog());</span>
+<span class="fc" id="L154">    jjp.inputFile = gram;</span>
+<span class="fc" id="L155">    jjp.intermediateOutputDirectories = dirs;</span>
+<span class="fc" id="L156">    jjp.intermedOutDirOptions = new String[] {</span>
+        JJTreeArgumentsBean.argOutDir
+    };
+<span class="fc" id="L159">    jjp.cmdLineArgs = jjtreeCmdLineArgs;</span>
+<span class="fc" id="L160">    jjp.run();</span>
+<span class="fc" id="L161">  }</span>
+  
+  @Override
+  protected String getGrammarFileEncoding() {
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    return (jjtab.grammarFileEncodingOptionValue == null)</span>
+        ? AbstractArgumentsBean.defaultGrammarFileEncoding
+        : jjtab.grammarFileEncodingOptionValue;
+  }
+  
+  @Override
+  protected Language getLanguage() {
+<span class="fc bfc" id="L172" title="All 2 branches covered.">    return jjtab.languageOptionValue == null ? AbstractArgumentsBean.defaultLanguage</span>
+        : jjtab.languageOptionValue;
+  }
+  
+  @Override
+  protected File[] getProcessorOutputDirectories() {
+<span class="fc" id="L178">    return jjtab.processorOutputDirectories;</span>
+  }
+  
+  @Override
+  protected File[] getGoalOutputDirectories() {
+<span class="fc" id="L183">    return jjtab.processorOutputDirectories;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Integration tests coverage report</div></body></html>
