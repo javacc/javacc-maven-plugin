@@ -1,6 +1,6 @@
 # JavaCC Maven plugin, from javacc.org
 
-This is the **JavaCC Maven plugin** Git repository, for **JavaCC / JJTree version 8+**.  
+This is the **JavaCC Maven plugin** Git repository, for **JavaCC / JJTree v8+** and **JTB v1.5+**.  
 
 The other JavaCC plugins in the wild do not support the full JavaCC 8 features (architecture and options).  
 
@@ -18,14 +18,22 @@ Note also that one can use the MojoHaus Exec Maven plugin to run JavaCC, JJTree,
 
 ### Features
 
-- supports the different JavaCC 8 generators, through dependencies declaration
+- supports the different JavaCC 8 generators, through **dependencies declaration**
 - supports **javacc**, **jjtree**, **jtb** & **jjdoc** simple goals (executing the corresponding processor)
 - supports the combined **jjtree-javacc**, **jtb-javacc** goals (chaining execution of the preprocessor and javacc on a grammar file)
-- plugin agnostic of the processors options (except a very few of them) (options strings are passed transparently to the processors; no need to update the plugin when a processor changes some of its options)
-- supports detection of stale / not stale generated files with respect to the grammar file and the processors artifacts (the jars and customization resources): the plugin will launch the processors:
+- plugin **agnostic** of the processors options (except a very few of them) (options strings are passed transparently to the processors; no need to update the plugin when a processor changes some of its options)
+- supports detection of **stale / not stale** generated files with respect to the **grammar file** and the **processors artifacts** (the jars and customization resources): the plugin will launch the processors:
     * if the grammar file has been touched after the last generation
     * if the artifacts are newer than the generated files (this is handy when working on processors snapshots)
-- supports *ignoring* errors and failing on *last* error besides usual failing on *first* error, for plugin configuration, grammar reading and grammar processing errors (this is handy for integration tests, and may be also of interest for some projects)
+- supports **ignoring** errors and failing on **last** error besides usual failing on **first** error, for plugin configuration, grammar reading and grammar processing errors (this is handy for integration tests, and may be also of interest for some projects)
+
+## Publishing status
+
+Currently published release: ![Maven Central Version](https://img.shields.io/maven-central/v/org.javacc.plugin/javacc-maven-plugin?label=Maven&filter=3.8*)  
+
+Next release to publish: 3.8.0 (Feb 2026)
+
+Currently published snapshot: ![Maven Central Version](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Forg%2Fjavacc%2Fplugin%2Fjavacc-maven-plugin%2Fmaven-metadata.xml&label=Maven%20snapshots&strategy=latestProperty)
 
 ### Usage
 
