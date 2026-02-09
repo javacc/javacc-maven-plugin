@@ -76,8 +76,9 @@ In project's pom.xml or in parent's pom.xml:
           <artifactId>javacc-maven-plugin</artifactId>
           <version>${javacc-maven-plugin.version}</version>
           <dependencies>
-            <!-- declare all used generators artifacts;  the core may be omitted,
-                  as it is a dependency of the generators -->
+            <!-- declare all used generators artifacts;
+                 the core may be omitted, as it is a dependency of the generators
+                  (but is required if only jjdoc is used) -->
             <!--            <dependency>-->
             <!--              <groupId>org.javacc</groupId>-->
             <!--              <artifactId>core</artifactId>-->

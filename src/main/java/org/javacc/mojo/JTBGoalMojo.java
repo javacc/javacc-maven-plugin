@@ -117,8 +117,8 @@ public class JTBGoalMojo extends AbstractPluginMojo {
    * recommended to use distinct tag names in the parent, the same tag names in the child for those
    * that must be replaced and another tag name or other tag names for the new ones.</li>
    * </ul>
-   * See also <a href=
-   * "https://github.com/javacc/javacc-maven-plugin/readme.md#processor_parameters">Processor
+   * See also
+   * <a href= "https://github.com/javacc/javacc-maven-plugin#processor-parameters">Processor
    * parameters</a>.
    */
   @Parameter(property = "javacc.jtbCmdLineArgs") //

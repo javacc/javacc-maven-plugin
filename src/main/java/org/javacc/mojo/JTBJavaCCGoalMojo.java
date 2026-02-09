@@ -46,9 +46,9 @@ import org.apache.maven.plugins.annotations.Parameter;
  * <p>
  * Detailed information about the JTB and JavaCC options can be found on the
  * <a href="https://github.com/jtb-javacc/JTB/blob/master/doc/wiki/How_to_use.md">JTB wiki</a> and
- * the <a href="https://javacc.github.io/javacc/">JavaCC website</a>.<br>
- * The code repository can be found within <a href="https://github.com/jtb-javacc">JTB at GitHub</a>
- * and <a href="https://github.com/javacc">JavaCC at GitHub</a>.
+ * the <a href="https://javacc.github.io/javacc-8/">JavaCC website</a>.<br>
+ * The code repositories can be found within <a href="https://github.com/jtb-javacc">JTB at
+ * GitHub</a> and <a href="https://github.com/javacc">JavaCC at GitHub</a>.
  * 
  * @since 3.8.0
  * @author Maͫzͣaͬsͨ

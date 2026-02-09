@@ -61,7 +61,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  * HTML "index" page in the "Project Documentation / Project Reports" menu of the site.
  * <p>
  * Detailed information about the JJDoc options can be found on the
- * <a href="https://javacc.github.io/javacc/documentation/jjdoc.html">JJDoc documentation
+ * <a href="https://javacc.github.io/javacc-8/documentation/jjdoc.html">JJDoc documentation
  * page</a>.<br>
  * Examples can be found in the integration tests <a href=
  * "https://github.com/javacc/javacc-maven-plugin/tree/master/src/it/jjdoc-goal">jjdoc-goal</a> and
@@ -119,7 +119,7 @@ public class JJDocGoalMojo extends AbstractPluginReport {
    * that must be replaced and another tag name or other tag names for the new ones.</li>
    * </ul>
    * See also <a href=
-   * "https://github.com/javacc/javacc-maven-plugin/readme.md#processor_parameters">Processor
+   * "https://github.com/javacc/javacc-maven-plugin#processor-parameters">Processor
    * parameters</a>.
    */
   @Parameter(property = "javacc.jjdocCmdLineArgs") //

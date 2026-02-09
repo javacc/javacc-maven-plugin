@@ -44,7 +44,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  * instead his customized version he has put in any compile source root.
  * <p>
  * Detailed information about the JavaCC options can be found on the
- * <a href="https://javacc.github.io/javacc/">JavaCC website</a>.<br>
+ * <a href="https://javacc.github.io/javacc-8/">JavaCC website</a>.<br>
  * The code repositories can be found within <a href="https://github.com/javacc">JavaCC at
  * GitHub</a>.
  *
@@ -112,8 +112,8 @@ public class JavaCCGoalMojo extends AbstractPluginMojo {
    * recommended to use distinct tag names in the parent, the same tag names in the child for those
    * that must be replaced and another tag name or other tag names for the new ones.</li>
    * </ul>
-   * See also <a href=
-   * "https://github.com/javacc/javacc-maven-plugin/readme.md#processor_parameters">Processor
+   * See also
+   * <a href= "https://github.com/javacc/javacc-maven-plugin#processor-parameters">Processor
    * parameters</a>.
    */
   @Parameter(property = "javacc.javaccCmdLineArgs") //

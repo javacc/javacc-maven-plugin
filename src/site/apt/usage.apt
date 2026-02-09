@@ -1,17 +1,17 @@
  ------
- Using
+ Usage
  ------
   Marc Mazas <mazas.marc at gmail.com>
  ------
   January 2026
  ------
 
-Using
+Detailed Usage
 
 * Pom.xml
 
   In project's <<<pom.xml>>> or in parent's <<<pom.xml>>>:\
-  - manage versions of the plugin and the dependencies (the processors artifacts)\
+  - manage versions of the plugin and of the dependencies (the processors artifacts)\
   - if advantageous configure default values for common arguments for different executions
 
 -------------------
@@ -37,8 +37,9 @@ Using
           <artifactId>javacc-maven-plugin</artifactId>
           <version>$\{javacc.maven.plugin.version\}</version>
           <dependencies>
-            <!-- declare all used generators artifacts;  the core may be omitted,
-                  as it is a dependency of the generators -->
+            <!-- declare all used generators artifacts;
+                 the core may be omitted, as it is a dependency of the generators
+                  (but is required if only jjdoc is used) -->
             <!--            <dependency>-->
             <!--              <groupId>org.javacc</groupId>-->
             <!--              <artifactId>core</artifactId>-->
@@ -180,7 +181,7 @@ mvn generate-sources -Dorg.slf4j.simpleLogger.log.org.javacc.mojo=debug
 * Parameters
 
   The mojos' parameters are described under each mojo; there are also additional explanations
-  in the {{{https://github.com/javacc/javacc-maven-plugin/blob/release/README.md}README}},
+  in the {{{https://github.com/javacc/javacc-maven-plugin?tab=readme-ov-file}README}},
   especially on inheritance and overriding of parent's parameters.
  
   

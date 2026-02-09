@@ -45,7 +45,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
     <menu name="Overview">
       <item name="Introduction" href="index.html" />
       <item name="Plugin Documentation" href="plugin-info.html" />
-      <item name="Using" href="using.html" />
+      <item name="Usage" href="usage.html" />
       <item name="Publishing status" href="publishing-status.html" />
       <item name="Maven Hosting" href="https://central.sonatype.com/artifact/org.javacc.plugin/javacc-maven-plugin" />
       <item name="License" href="https://opensource.org/license/bsd-3-clause/" />
@@ -60,9 +60,9 @@ THE POSSIBILITY OF SUCH DAMAGE.
       <item name="help" href="help-mojo.html" />
     </menu>
     <menu name="References">
-      <item name="JavaCC / JJTree / JJDoc web site" href="https://javacc.github.io/javacc/" />
+      <item name="JavaCC / JJTree / JJDoc web site" href="https://javacc.github.io/javacc-8/" />
       <item name="JavaCC / JJTree / JJDoc documentation"
-        href="https://javacc.github.io/javacc/documentation/jjdoc.html" />
+        href="https://javacc.github.io/javacc-8/documentation/jjdoc.html" />
       <item name="JavaCC repositories" href="https://github.com/javacc/" />
       <item name="JTB repository" href="https://github.com/jtb-javacc/" />
       <item name="The javacc-maven-plugin README"
