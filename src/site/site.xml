@@ -46,6 +46,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
       <item name="Introduction" href="index.html" />
       <item name="Plugin Documentation" href="plugin-info.html" />
       <item name="Usage" href="usage.html" />
+      <item name="Release Notes" href="release-notes.html" />
       <item name="Publishing status" href="publishing-status.html" />
       <item name="Maven Hosting" href="https://central.sonatype.com/artifact/org.javacc.plugin/javacc-maven-plugin" />
       <item name="License" href="https://opensource.org/license/bsd-3-clause/" />
