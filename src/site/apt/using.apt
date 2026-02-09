@@ -1,14 +1,14 @@
  ------
- Usage
+ Using
  ------
   Marc Mazas <mazas.marc at gmail.com>
  ------
   January 2026
  ------
 
-Usage
+Using
 
-* {Pom.xml}
+* Pom.xml
 
   In project's <<<pom.xml>>> or in parent's <<<pom.xml>>>:\
   - manage versions of the plugin and the dependencies (the processors artifacts)\
@@ -157,7 +157,7 @@ mvn site
 +-----+
 
 
-* {Examples}
+* Examples
 
   See the different <<<pom.xml>>> in the integration tests projects under
   {{{https://github.com/javacc/javacc-maven-plugin/tree/master/src/it}/src/it}}
@@ -167,7 +167,7 @@ mvn site
   {{{https://github.com/javacc/javacc-maven-plugin/tree/master/src/it/pom.xml}/src/it/pom.xml}}
   (that itself does not inherit from a parent).
 
-* {Debug}
+* Debug
 
   You can enable the plugin's debug mode by passing the SLF4J managed environment variable 
   <<<org.slf4j.simpleLogger.log.org.javacc.mojo>>> set to <<<debug>>>:
@@ -177,7 +177,7 @@ mvn generate-sources -Dorg.slf4j.simpleLogger.log.org.javacc.mojo=debug
 +-----+
 
 
-* {Parameters}
+* Parameters
 
   The mojos' parameters are described under each mojo; there are also additional explanations
   in the {{{https://github.com/javacc/javacc-maven-plugin/blob/release/README.md}README}},

@@ -34,6 +34,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
   <bannerLeft name="The JavaCC Maven plugin ..." href="https://github.com/javacc/javacc-maven-plugin"></bannerLeft>
   <bannerRight name="... from javacc.org" href="https://github.com/javacc"></bannerRight>
+  <publishDate position="right"/>
+  <version position="right"/>
 
   <body>
     <breadcrumbs>
@@ -43,8 +45,9 @@ THE POSSIBILITY OF SUCH DAMAGE.
     <menu name="Overview">
       <item name="Introduction" href="index.html" />
       <item name="Plugin Documentation" href="plugin-info.html" />
-      <item name="Usage" href="usage.html" />
-      <item name="Sonatype Hosting" href="https://central.sonatype.com/artifact/org.javacc.plugin/javacc-maven-plugin" />
+      <item name="Using" href="using.html" />
+      <item name="Publishing status" href="publishing-status.html" />
+      <item name="Maven Hosting" href="https://central.sonatype.com/artifact/org.javacc.plugin/javacc-maven-plugin" />
       <item name="License" href="https://opensource.org/license/bsd-3-clause/" />
     </menu>
     <menu name="Goals">

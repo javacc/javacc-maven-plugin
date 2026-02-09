@@ -82,7 +82,7 @@ ${project.name}
   * <<<{{{./help-mojo.html}javacc:help}}>>>\
     Displays parameters for all or one goal.
    
-* {Usage}
+* Usage
   
   Detailed instructions on how to use the JavaCC plugin (pom configuration, debug mode) can be
    found on the {{{./usage.html}usage}} page.
@@ -90,4 +90,3 @@ ${project.name}
   In case you still have questions regarding the plugin's usage, or if you feel like the plugin
    is missing a feature or has a defect, you can fill a feature request or bug report in our
   {{{https://github.com/javacc/javacc-maven-plugin/issues}issue tracker}}.
-
