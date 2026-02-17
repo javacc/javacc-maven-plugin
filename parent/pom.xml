@@ -34,12 +34,14 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
   <groupId>org.javacc.plugin</groupId>
   <artifactId>javacc-maven-plugin-parent</artifactId>
-  <version>3.8.0-SNAPSHOT</version>
+  <version>3.8.0.1</version>
+  <!--  <version>3.8.1-SNAPSHOT</version>-->
   <packaging>pom</packaging>
 
   <name>JavaCC Maven Plugin parent</name>
   <description>The parent pom for the JavaCC Maven Plugin, defining common properties and profiles,
     for building and running the plugin, used by the plugin pom and the integration tests pom.</description>
+  <url>https://github.com/javacc/javacc-maven-plugin/</url>
 
   <!-- run mvn install / deploy -Psnapshot / deploy -Prelease on this pom
         after changes to let the children use them -->
@@ -50,15 +52,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
     <!-- note a lot of trouble trying to find a working set of versions -->
     <!-- run mvn dependency:tree to see the effective versions and scopes -->
 
-    <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>
-    <javacc.version>8.1.0-SNAPSHOT</javacc.version>
-    <!-- for javacc (core only needed) / jtb dependencies used for compiling the plugin code -->
-    <javacc.core.version>${javacc.version}</javacc.core.version>
-    <jtb.version>1.5.3-SNAPSHOT</jtb.version>
-    <!-- for java / csharp dependencies used for running the plugin in the integration tests -->
-    <javacc.cpp.version>${javacc.version}</javacc.cpp.version>
-    <javacc.csharp.version>${javacc.version}</javacc.csharp.version>
-    <javacc.java.version>${javacc.version}</javacc.java.version>
+    <!-- JavaCC & JTB dependencies versions are set in plugin & integration tests poms,
+          to decouple them -->
 
     <!-- for other dependencies used for compiling the plugin code -->
     <doxia-sink-api.version>2.0.0</doxia-sink-api.version>
@@ -118,6 +113,77 @@ THE POSSIBILITY OF SUCH DAMAGE.
     <site.dir>${project.basedir}/docs</site.dir>
 
   </properties>
+  <developers>
+    <developer>
+      <name>Benjamin Bentmann</name>
+      <roles>
+        <role>Initial &amp; main developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <email>jruiz AT exist.com</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <email>jesse.mcconnell AT gmail.com</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Gregory Kick</name>
+      <email>gk5885 AT kickstyle.net</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Paul Gier</name>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <id>zosrothko</id>
+      <name>Francis André</name>
+      <email>zosrothko AT orange.fr</email>
+      <organization>Kampbell</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+
+    <developer>
+      <name>Marc Mazas</name>
+      <email>mazas.marc AT gmail.com</email>
+      <roles>
+        <role>Developer (v3.8.x)</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/javacc/javacc-maven-plugin</url>
+    <connection>scm:git:https://github.com/javacc/javacc-maven-plugin.git</connection>
+    <developerConnection> scm:git:ssh://git@github.com/javacc/javacc-maven-plugin.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+
+  <licenses>
+    <license>
+      <name>BSD-3-Clause License</name>
+      <url>https://opensource.org/license/bsd-3-clause/</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <build>
     <pluginManagement>
@@ -321,6 +387,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
                        C:\Program Files (x86)\GnuPG\bin\pinentry-basic.exe to
                        C:\Program Files (x86)\GnuPG\bin\pinentry.exe
                        in order to get rid of error 'no pinentry' -->
+                  <!-- cannot input interactively the pass phrase; need to put it in cache -->
                   <gpgArguments>
                     <arg>--pinentry-mode</arg>
                     <arg>loopback</arg>
@@ -338,12 +405,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
               <!--              <autoPublish>true</autoPublish>-->
               <!--             <waitUntil>published</waitUntil>-->
               <!-- centralBaseUrl is the default https://central.sonatype.com -->
-              <!-- deploymentName is the default Deployment -->
+              <deploymentName>${project.artifactId}</deploymentName>
               <!-- outputDirectory is the default central-publishing -->
               <!-- outputFilename is the default central-bundle.zip -->
               <!-- outputDirectory is the default central-publishing -->
               <!-- publishingServerId points to a server of that name in settings.xml -->
-              <publishingServerId>centralportalXXX</publishingServerId>
+              <publishingServerId>centralportal</publishingServerId>
               <!-- stagingDirectory is the default central-staging -->
             </configuration>
           </plugin>
